@@ -3,7 +3,6 @@ package com.mokaneko.pomoneko.ui
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.snapping.SnapPosition
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,16 +13,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
@@ -36,19 +35,24 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.constraintlayout.compose.ChainStyle
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.ConstraintSet
 import androidx.constraintlayout.compose.Dimension
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.mokaneko.pomoneko.R
+import com.mokaneko.pomoneko.domain.model.TimerState
 import com.mokaneko.pomoneko.ui.theme.Green
 import com.mokaneko.pomoneko.ui.theme.Inactive
 import com.mokaneko.pomoneko.ui.theme.White
 import com.mokaneko.pomoneko.ui.theme.itim
-import com.mokaneko.pomoneko.ui.theme.poppins
+import com.mokaneko.pomoneko.viewmodel.HomeViewModel
 
 @Composable
-fun HomeScreen() {
+fun HomeScreen(
+    viewModel: HomeViewModel = hiltViewModel()
+) {
+
+    val uiState by viewModel.uiState.collectAsState()
 
     /*------------------- Constraint Start -------------------*/
     val constraints = ConstraintSet {
@@ -121,7 +125,7 @@ fun HomeScreen() {
         TaskTimer()
         PomodoroSection()
         SectionText()
-        TimerControl(timerState = "Stopped")
+        TimerControl()
         SwipeMenu()
     }
 
@@ -295,39 +299,33 @@ fun SectionText(currentSection: String = "Pomodoro") {
 
 /*------------------- Play or Pause -------------------*/
 @Composable
-fun TimerControl(timerState: String) {
+fun TimerControl(
+    timerState: TimerState = TimerState.Stopped,
+) {
     Box(
         modifier = Modifier
             .layoutId("timerControl")
             .fillMaxWidth()
             .height(64.dp)
     ) {
-        if (timerState == "Stopped") {
-            Button(
-                onClick = { /* TODO: Add click action */ },
-                modifier = Modifier.align(Alignment.Center),
-                shape = RoundedCornerShape(10),
-                colors = androidx.compose.material3.ButtonDefaults.buttonColors(
-                    containerColor = Transparent
-                )
-            ) {
-                PlayIcon()
+        when (timerState) {
+            TimerState.Stopped -> {
+                Button(onClick = {/*TODO: add click action*/}) {
+                    PlayIcon()
+                }
+                Button(
+                    onClick = {/*TODO: add click action*/},
+                    modifier = Modifier.align(Alignment.CenterEnd).padding(end = 60.dp)
+                ) {
+                    ResetIcon()
+                }
             }
-            Button(
-                onClick = { /* TODO: Add click action */ },
-                modifier = Modifier.align(Alignment.CenterEnd).padding(end = 60.dp),
-                shape = RoundedCornerShape(10),
-                colors = androidx.compose.material3.ButtonDefaults.buttonColors(
-                    containerColor = Transparent
-                )
-            ) {
-                ResetIcon()
+            TimerState.Running,
+            TimerState.Paused -> {
+                Button(onClick = {/*TODO: add click action*/}) {
+                    PauseIcon()
+                }
             }
-
-        } else {
-            PauseIcon(
-                modifier = Modifier.align(Alignment.Center)
-            )
         }
     }
 }

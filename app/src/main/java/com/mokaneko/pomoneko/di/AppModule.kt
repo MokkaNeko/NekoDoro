@@ -1,7 +1,5 @@
 package com.mokaneko.pomoneko.di
 
-import com.mokaneko.pomoneko.repository.TimerRepository
-import com.mokaneko.pomoneko.repository.TimerRepositoryImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -12,9 +10,4 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object AppModule {
 
-    @Provides
-    @Singleton
-    fun provideTimerRepository(): TimerRepository {
-        return TimerRepositoryImpl()
-    }
 }

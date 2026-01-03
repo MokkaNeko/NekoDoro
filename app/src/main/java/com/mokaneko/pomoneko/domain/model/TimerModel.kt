@@ -1,4 +1,4 @@
-package com.mokaneko.pomoneko.model
+package com.mokaneko.pomoneko.domain.model
 
 data class TimerModel(
     val timerPomodoro: Long,
