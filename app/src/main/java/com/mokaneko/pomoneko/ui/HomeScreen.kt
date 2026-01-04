@@ -13,16 +13,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
@@ -38,21 +38,14 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.ConstraintSet
 import androidx.constraintlayout.compose.Dimension
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.mokaneko.pomoneko.R
-import com.mokaneko.pomoneko.domain.model.TimerState
 import com.mokaneko.pomoneko.ui.theme.Green
 import com.mokaneko.pomoneko.ui.theme.Inactive
 import com.mokaneko.pomoneko.ui.theme.White
 import com.mokaneko.pomoneko.ui.theme.itim
-import com.mokaneko.pomoneko.viewmodel.HomeViewModel
 
 @Composable
-fun HomeScreen(
-    viewModel: HomeViewModel = hiltViewModel()
-) {
-
-    val uiState by viewModel.uiState.collectAsState()
+fun HomeScreen() {
 
     /*------------------- Constraint Start -------------------*/
     val constraints = ConstraintSet {
@@ -125,7 +118,7 @@ fun HomeScreen(
         TaskTimer()
         PomodoroSection()
         SectionText()
-        TimerControl()
+        TimerControl(timerState = "Stopped")
         SwipeMenu()
     }
 
@@ -299,33 +292,39 @@ fun SectionText(currentSection: String = "Pomodoro") {
 
 /*------------------- Play or Pause -------------------*/
 @Composable
-fun TimerControl(
-    timerState: TimerState = TimerState.Stopped,
-) {
+fun TimerControl(timerState: String) {
     Box(
         modifier = Modifier
             .layoutId("timerControl")
             .fillMaxWidth()
             .height(64.dp)
     ) {
-        when (timerState) {
-            TimerState.Stopped -> {
-                Button(onClick = {/*TODO: add click action*/}) {
-                    PlayIcon()
-                }
-                Button(
-                    onClick = {/*TODO: add click action*/},
-                    modifier = Modifier.align(Alignment.CenterEnd).padding(end = 60.dp)
-                ) {
-                    ResetIcon()
-                }
+        if (timerState == "Stopped") {
+            Button(
+                onClick = { /* TODO: Add click action */ },
+                modifier = Modifier.align(Alignment.Center),
+                shape = RoundedCornerShape(10),
+                colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                    containerColor = Transparent
+                )
+            ) {
+                PlayIcon()
             }
-            TimerState.Running,
-            TimerState.Paused -> {
-                Button(onClick = {/*TODO: add click action*/}) {
-                    PauseIcon()
-                }
+            Button(
+                onClick = { /* TODO: Add click action */ },
+                modifier = Modifier.align(Alignment.CenterEnd).padding(end = 60.dp),
+                shape = RoundedCornerShape(10),
+                colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                    containerColor = Transparent
+                )
+            ) {
+                ResetIcon()
             }
+
+        } else {
+            PauseIcon(
+                modifier = Modifier.align(Alignment.Center)
+            )
         }
     }
 }
