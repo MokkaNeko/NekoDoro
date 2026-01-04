@@ -1,6 +1,6 @@
-package com.mokaneko.pomoneko.model
+package com.mokaneko.pomoneko.domain.model
 
-data class SettingModel(
+data class PomodoroSetting(
     val autoStartPomodoro: Boolean,
     val autoStartBreak: Boolean,
     val vibration: Boolean,

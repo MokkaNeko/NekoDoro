@@ -1,4 +1,4 @@
-package com.mokaneko.pomoneko.ui
+package com.mokaneko.pomoneko.ui.settings
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -22,6 +21,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign.Companion.Center
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -32,9 +32,11 @@ import com.mokaneko.pomoneko.ui.theme.Pink
 import com.mokaneko.pomoneko.ui.theme.White
 import com.mokaneko.pomoneko.ui.theme.itim
 import com.mokaneko.pomoneko.ui.theme.poppins
+import com.mokaneko.pomoneko.ui.timer.ResetIcon
+import com.mokaneko.pomoneko.ui.timer.SwipeUpIcon
 
 @Composable
-fun Option() {
+fun SettingsScreen() {
     Box(
         modifier = Modifier
             .background(Green)
@@ -64,7 +66,7 @@ fun Option() {
                 color = White,
                 fontFamily = poppins,
                 fontSize = 20.sp,
-                fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+                fontWeight = FontWeight.Bold,
                 textAlign = Center
             )
             Row(
@@ -94,17 +96,17 @@ fun Option() {
                             color = White,
                             fontFamily = itim,
                             fontSize = 35.sp,
-                            fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
+                            fontWeight = FontWeight.Bold
                         )
                     }
                     Text(
                         modifier = Modifier.padding(top = 8.dp),
-                        text = "Pomodoro",
+                        text = "Focus",
                         color = White,
                         fontFamily = poppins,
                         fontSize = 16.sp,
                         textAlign = Center,
-                        fontWeight = androidx.compose.ui.text.font.FontWeight.Medium
+                        fontWeight = FontWeight.Medium
                     )
                 }
                 Column(
@@ -128,7 +130,7 @@ fun Option() {
                             color = White,
                             fontFamily = itim,
                             fontSize = 35.sp,
-                            fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
+                            fontWeight = FontWeight.Bold
                         )
                     }
                     Text(
@@ -138,7 +140,7 @@ fun Option() {
                         fontFamily = poppins,
                         fontSize = 16.sp,
                         textAlign = Center,
-                        fontWeight = androidx.compose.ui.text.font.FontWeight.Medium
+                        fontWeight = FontWeight.Medium
                     )
                 }
                 Column(
@@ -162,7 +164,7 @@ fun Option() {
                             color = White,
                             fontFamily = itim,
                             fontSize = 35.sp,
-                            fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
+                            fontWeight = FontWeight.Bold
                         )
                     }
                     Text(
@@ -172,7 +174,7 @@ fun Option() {
                         fontFamily = poppins,
                         fontSize = 16.sp,
                         textAlign = Center,
-                        fontWeight = androidx.compose.ui.text.font.FontWeight.Medium
+                        fontWeight = FontWeight.Medium
                     )
                 }
             }
@@ -200,7 +202,7 @@ fun Option() {
                     fontFamily = poppins,
                     fontSize = 16.sp,
                     textAlign = Center,
-                    fontWeight = androidx.compose.ui.text.font.FontWeight.Medium
+                    fontWeight = FontWeight.Medium
                 )
             }
 
@@ -211,7 +213,7 @@ fun Option() {
                 color = White,
                 fontFamily = poppins,
                 fontSize = 20.sp,
-                fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+                fontWeight = FontWeight.Bold,
                 textAlign = Center
             )
             Box(
@@ -226,7 +228,7 @@ fun Option() {
                     color = White,
                     fontFamily = itim,
                     fontSize = 35.sp,
-                    fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
+                    fontWeight = FontWeight.Bold
                 )
             }
 
@@ -237,7 +239,7 @@ fun Option() {
                 color = White,
                 fontFamily = poppins,
                 fontSize = 20.sp,
-                fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+                fontWeight = FontWeight.Bold,
                 textAlign = Center
             )
             Box(
@@ -258,7 +260,7 @@ fun Option() {
                         color = White,
                         fontFamily = itim,
                         fontSize = 18.sp,
-                        fontWeight = androidx.compose.ui.text.font.FontWeight.Medium
+                        fontWeight = FontWeight.Medium
                     )
                     Box(
                         modifier = Modifier
@@ -288,7 +290,7 @@ fun Option() {
                         color = White,
                         fontFamily = itim,
                         fontSize = 18.sp,
-                        fontWeight = androidx.compose.ui.text.font.FontWeight.Medium
+                        fontWeight = FontWeight.Medium
                     )
                     Box(
                         modifier = Modifier
@@ -307,7 +309,7 @@ fun Option() {
                 color = White,
                 fontFamily = poppins,
                 fontSize = 20.sp,
-                fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+                fontWeight = FontWeight.Bold,
                 textAlign = Center
             )
             Box(
@@ -328,7 +330,7 @@ fun Option() {
                         color = White,
                         fontFamily = itim,
                         fontSize = 18.sp,
-                        fontWeight = androidx.compose.ui.text.font.FontWeight.Medium
+                        fontWeight = FontWeight.Medium
                     )
                     Box(
                         modifier = Modifier
@@ -358,7 +360,7 @@ fun Option() {
                         color = White,
                         fontFamily = itim,
                         fontSize = 18.sp,
-                        fontWeight = androidx.compose.ui.text.font.FontWeight.Medium
+                        fontWeight = FontWeight.Medium
                     )
                     Box(
                         modifier = Modifier
@@ -377,7 +379,7 @@ fun Option() {
                 color = White,
                 fontFamily = poppins,
                 fontSize = 20.sp,
-                fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+                fontWeight = FontWeight.Bold,
                 textAlign = Center
             )
             Row(
@@ -403,7 +405,7 @@ fun Option() {
                         color = White,
                         fontFamily = itim,
                         fontSize = 18.sp,
-                        fontWeight = androidx.compose.ui.text.font.FontWeight.Medium
+                        fontWeight = FontWeight.Medium
                     )
                 }
                 Button(
@@ -423,7 +425,7 @@ fun Option() {
                         color = White,
                         fontFamily = itim,
                         fontSize = 18.sp,
-                        fontWeight = androidx.compose.ui.text.font.FontWeight.Medium
+                        fontWeight = FontWeight.Medium
                     )
                 }
             }
@@ -435,7 +437,7 @@ fun Option() {
                 color = White,
                 fontFamily = poppins,
                 fontSize = 20.sp,
-                fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+                fontWeight = FontWeight.Bold,
                 textAlign = Center
             )
             Button(
@@ -459,7 +461,7 @@ fun Option() {
                 color = White,
                 fontFamily = poppins,
                 fontSize = 20.sp,
-                fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+                fontWeight = FontWeight.Bold,
                 textAlign = Center
             )
             Row(
@@ -489,7 +491,7 @@ fun Option() {
                             color = White,
                             fontFamily = itim,
                             fontSize = 35.sp,
-                            fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
+                            fontWeight = FontWeight.Bold
                         )
                     }
                     Text(
@@ -499,7 +501,7 @@ fun Option() {
                         fontFamily = poppins,
                         fontSize = 14.sp,
                         textAlign = Center,
-                        fontWeight = androidx.compose.ui.text.font.FontWeight.Medium
+                        fontWeight = FontWeight.Medium
                     )
                 }
                 Column(
@@ -523,7 +525,7 @@ fun Option() {
                             color = White,
                             fontFamily = itim,
                             fontSize = 35.sp,
-                            fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
+                            fontWeight = FontWeight.Bold
                         )
                     }
                     Text(
@@ -533,7 +535,7 @@ fun Option() {
                         fontFamily = poppins,
                         fontSize = 14.sp,
                         textAlign = Center,
-                        fontWeight = androidx.compose.ui.text.font.FontWeight.Medium
+                        fontWeight = FontWeight.Medium
                     )
                 }
                 Column(
@@ -566,7 +568,7 @@ fun Option() {
                         fontFamily = poppins,
                         fontSize = 14.sp,
                         textAlign = Center,
-                        fontWeight = androidx.compose.ui.text.font.FontWeight.Medium
+                        fontWeight = FontWeight.Medium
                     )
                 }
             }
@@ -579,7 +581,7 @@ fun Option() {
                 fontFamily = poppins,
                 fontSize = 10.sp,
                 textAlign = Center,
-                fontWeight = androidx.compose.ui.text.font.FontWeight.Medium
+                fontWeight = FontWeight.Medium
             )
         }
     }
@@ -593,5 +595,5 @@ fun SwipeDown(modifier: Modifier) {
 @Composable
 @Preview
 fun OptionPreview() {
-    Option()
+    SettingsScreen()
 }

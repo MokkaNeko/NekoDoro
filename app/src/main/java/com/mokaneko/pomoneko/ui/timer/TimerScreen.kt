@@ -1,9 +1,8 @@
-package com.mokaneko.pomoneko.ui
+package com.mokaneko.pomoneko.ui.timer
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.snapping.SnapPosition
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -36,7 +36,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.constraintlayout.compose.ChainStyle
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.ConstraintSet
 import androidx.constraintlayout.compose.Dimension
@@ -45,10 +44,14 @@ import com.mokaneko.pomoneko.ui.theme.Green
 import com.mokaneko.pomoneko.ui.theme.Inactive
 import com.mokaneko.pomoneko.ui.theme.White
 import com.mokaneko.pomoneko.ui.theme.itim
-import com.mokaneko.pomoneko.ui.theme.poppins
 
 @Composable
-fun HomeScreen() {
+fun TimerScreen(
+    uiState: TimerUiState,
+    onPlay: () -> Unit,
+    onPause: () -> Unit,
+    onReset: () -> Unit
+) {
 
     /*------------------- Constraint Start -------------------*/
     val constraints = ConstraintSet {
@@ -116,13 +119,18 @@ fun HomeScreen() {
             .fillMaxSize()
             .background(Green)
     ) {
-        TaskName()
+        TaskName(name = uiState.taskName)
         CatClock()
-        TaskTimer()
-        PomodoroSection()
-        SectionText()
-        TimerControl(timerState = "Stopped")
-        SwipeMenu()
+        TaskTimer(timer = uiState.timerText)
+        PomodoroSection(section = uiState.section)
+        SectionText(currentSection = uiState.sectionText)
+        TimerControl(
+            timerState = uiState.timerState,
+            onPlay = onPlay,
+            onPause = onPause,
+            onReset = onReset
+        )
+//        SwipeMenu()
     }
 
     /*------------------- Constraint End -------------------*/
@@ -130,7 +138,7 @@ fun HomeScreen() {
 
 /*------------------- Name -------------------*/
 @Composable
-fun TaskName(name: String = "This cat needs a name") {
+fun TaskName(name: String) {
     Text(
         modifier = Modifier.layoutId("taskName"),
         text = name,
@@ -171,7 +179,7 @@ fun CatClock() {
 
 /*------------------- Timer Number -------------------*/
 @Composable
-fun TaskTimer(timer: String = "00:00") {
+fun TaskTimer(timer: String) {
     Text(
         modifier = Modifier
             .layoutId("taskTimer")
@@ -186,7 +194,7 @@ fun TaskTimer(timer: String = "00:00") {
 
 /*------------------- Pomodoro Section -------------------*/
 @Composable
-fun PomodoroSection(section: Int = 4) {
+fun PomodoroSection(section: Int) {
     Row(
         modifier = Modifier
             .padding(top = 20.dp)
@@ -280,7 +288,7 @@ fun PomodoroSection(section: Int = 4) {
 
 /*------------------- Section Text -------------------*/
 @Composable
-fun SectionText(currentSection: String = "Pomodoro") {
+fun SectionText(currentSection: String) {
     Text(
         modifier = Modifier
             .padding(top = 20.dp)
@@ -295,39 +303,60 @@ fun SectionText(currentSection: String = "Pomodoro") {
 
 /*------------------- Play or Pause -------------------*/
 @Composable
-fun TimerControl(timerState: String) {
+fun TimerControl(
+    timerState: TimerState,
+    onPlay: () -> Unit,
+    onPause: () -> Unit,
+    onReset: () -> Unit
+) {
     Box(
         modifier = Modifier
             .layoutId("timerControl")
             .fillMaxWidth()
             .height(64.dp)
     ) {
-        if (timerState == "Stopped") {
-            Button(
-                onClick = { /* TODO: Add click action */ },
-                modifier = Modifier.align(Alignment.Center),
-                shape = RoundedCornerShape(10),
-                colors = androidx.compose.material3.ButtonDefaults.buttonColors(
-                    containerColor = Transparent
-                )
-            ) {
-                PlayIcon()
+        when (timerState) {
+            TimerState.STOPPED -> {
+                Button(
+                    onClick = onPlay,
+                    modifier = Modifier
+                        .align(Alignment.Center),
+                    shape = RoundedCornerShape(10),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Transparent
+                    )
+                ) { PlayIcon() }
             }
-            Button(
-                onClick = { /* TODO: Add click action */ },
-                modifier = Modifier.align(Alignment.CenterEnd).padding(end = 60.dp),
-                shape = RoundedCornerShape(10),
-                colors = androidx.compose.material3.ButtonDefaults.buttonColors(
-                    containerColor = Transparent
-                )
-            ) {
-                ResetIcon()
+            TimerState.PAUSED -> {
+                Button(
+                    onClick = onPlay,
+                    modifier = Modifier
+                        .align(Alignment.Center),
+                    shape = RoundedCornerShape(10),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Transparent
+                    )
+                ) { PlayIcon() }
+                Button(
+                    onClick = onReset,
+                    modifier = Modifier.align(Alignment.CenterEnd).padding(end = 60.dp),
+                    shape = RoundedCornerShape(10),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Transparent
+                    )
+                ) { ResetIcon() }
             }
-
-        } else {
-            PauseIcon(
-                modifier = Modifier.align(Alignment.Center)
-            )
+            else -> {
+                Button(
+                    onClick = onPause,
+                    modifier = Modifier
+                        .align(Alignment.Center),
+                    shape = RoundedCornerShape(10),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Transparent
+                    )
+                ) { PauseIcon() }
+            }
         }
     }
 }
@@ -450,8 +479,22 @@ fun SwipeUpIcon(
 
 /*------------------- End of Icon -------------------*/
 
-@Preview
+/*------------------- Preview -------------------*/
+private val PreviewTimerState = TimerUiState(
+    taskName = "This cat needs a name",
+    timerText = "25:00",
+    section = 4,
+    sectionText = "Focus",
+    timerState = TimerState.STOPPED
+)
+
+@Preview(showBackground = true)
 @Composable
-fun HomeScreenPreview() {
-    HomeScreen()
+fun TimerScreenPreview() {
+    TimerScreen(
+        uiState = PreviewTimerState,
+        onPlay = {},
+        onPause = {},
+        onReset = {}
+    )
 }

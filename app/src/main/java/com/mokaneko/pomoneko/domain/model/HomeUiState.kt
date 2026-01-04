@@ -1,6 +1,6 @@
-package com.mokaneko.pomoneko.model
+package com.mokaneko.pomoneko.domain.model
 
-data class ClockTimer(
+data class HomeUiState(
     val taskName: String = "This cat needs a name",
     val progress: Float = 1f,
     val timeText: String = "25:00",

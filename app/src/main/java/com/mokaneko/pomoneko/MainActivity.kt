@@ -14,9 +14,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.mokaneko.pomoneko.ui.theme.PomoNekoTheme
+import com.mokaneko.pomoneko.ui.timer.TimerRoute
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,38 +28,9 @@ class MainActivity : ComponentActivity() {
                 Scaffold(modifier = Modifier
                     .fillMaxSize()
                 ) { innerPadding ->
-                    Box(modifier = Modifier
-                        .fillMaxSize()
-                        .background(color = Color(0xFFB8DB80))
-                    ) {
-                        Greeting(
-                            name = "Android",
-                            modifier = Modifier
-                                .padding(innerPadding)
-                        )
-                    }
+                    TimerRoute()
                 }
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Box(modifier = Modifier
-        .fillMaxSize()
-    ) {
-        Text(
-            text = "Hello $name!",
-            modifier = modifier
-        )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    PomoNekoTheme {
-        Greeting("Android")
     }
 }
