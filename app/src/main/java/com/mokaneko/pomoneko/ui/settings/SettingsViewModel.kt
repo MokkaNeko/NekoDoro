@@ -1,10 +1,10 @@
-package com.mokaneko.pomoneko.viewmodel
+package com.mokaneko.pomoneko.ui.settings
 
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
-class SettingViewModel @Inject constructor() : ViewModel() {
+class SettingsViewModel @Inject constructor() : ViewModel() {
 
 }
