@@ -1,5 +1,6 @@
 package com.mokaneko.pomoneko.ui.timer
 
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -18,6 +19,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -120,7 +122,7 @@ fun TimerScreen(
             .background(Green)
     ) {
         TaskName(name = uiState.taskName)
-        CatClock()
+        CatClock(progress = uiState.progress)
         TaskTimer(timer = uiState.timerText)
         PomodoroSection(section = uiState.section)
         SectionText(currentSection = uiState.sectionText)
@@ -151,7 +153,11 @@ fun TaskName(name: String) {
 
 /*------------------- Clock -------------------*/
 @Composable
-fun CatClock() {
+fun CatClock(progress: Float) {
+    val animatedProgress by animateFloatAsState(
+        targetValue = progress,
+        label = "TimerProgress"
+    )
     Box(
         modifier = Modifier
             .layoutId("catClock")
@@ -160,6 +166,7 @@ fun CatClock() {
             .padding(horizontal = 16.dp)
     ) {
         TimerCircleBorder(
+            progress = animatedProgress,
             modifier = Modifier.size(280.dp).align(Alignment.Center).padding(top = 10.dp),
             strokeWidth = 18.dp
         )
@@ -167,12 +174,12 @@ fun CatClock() {
             painter = painterResource(R.drawable.ic_cat_face),
             contentDescription = "Clock",
             modifier = Modifier.size(240.dp).align(Alignment.Center).padding(top = 10.dp),
-            colorFilter = ColorFilter.tint(Inactive)
+            colorFilter = ColorFilter.tint(White)
         )
         Image(
             painter = painterResource(R.drawable.ic_cat_ear),
             contentDescription = "Clock",
-            colorFilter = ColorFilter.tint(Inactive)
+            colorFilter = ColorFilter.tint(White)
         )
     }
 }
@@ -210,7 +217,7 @@ fun PomodoroSection(section: Int) {
                     modifier = Modifier
                         .size(20.dp)
                 ) {
-                    drawCircle(color = Inactive)
+                    drawCircle(color = White)
                 }
             }
         } else {
@@ -370,21 +377,31 @@ fun SwipeMenu() {
 /*------------------- Icons -------------------*/
 @Composable
 fun TimerCircleBorder(
+    progress: Float,
     modifier: Modifier = Modifier,
     strokeWidth: Dp = 8.dp
 ) {
     Canvas(
-        modifier = modifier
-            .aspectRatio(1f)
+        modifier = modifier.aspectRatio(1f)
     ) {
         val stroke = Stroke(
             width = strokeWidth.toPx(),
             cap = StrokeCap.Round
         )
+        val startAngle = -90f
+        val whiteSweep = 360f * progress
+        val greySweep = 360f - whiteSweep
         drawArc(
             color = Inactive,
-            startAngle = -90f,
-            sweepAngle = 360f,
+            startAngle = startAngle + whiteSweep,
+            sweepAngle = greySweep,
+            useCenter = false,
+            style = stroke
+        )
+        drawArc(
+            color = White,
+            startAngle = startAngle,
+            sweepAngle = whiteSweep,
             useCenter = false,
             style = stroke
         )
@@ -485,7 +502,8 @@ private val PreviewTimerState = TimerUiState(
     timerText = "25:00",
     section = 4,
     sectionText = "Focus",
-    timerState = TimerState.STOPPED
+    timerState = TimerState.STOPPED,
+    progress = 1f
 )
 
 @Preview(showBackground = true)

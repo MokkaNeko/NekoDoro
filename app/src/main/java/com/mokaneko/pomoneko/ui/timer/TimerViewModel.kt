@@ -13,16 +13,18 @@ class TimerViewModel : ViewModel() {
     private val _uiState = mutableStateOf(
         TimerUiState(
             taskName = "This cat needs a name",
-            timerText = "25:00",
+            timerText = "1:00",
             section = 4,
             sectionText = "Focus",
-            timerState = TimerState.STOPPED
+            timerState = TimerState.STOPPED,
+            progress = 1f
         )
     )
     val uiState: State<TimerUiState> = _uiState
 
     private var timerJob: Job? = null
-    private var remainingSeconds = 25*60
+    private val totalSeconds = 1*60
+    private var remainingSeconds = totalSeconds
 
     private fun formatTime(seconds: Int): String {
         val m = seconds / 60
@@ -42,7 +44,8 @@ class TimerViewModel : ViewModel() {
                 delay(1000)
                 remainingSeconds--
                 _uiState.value = uiState.value.copy(
-                    timerText = formatTime(remainingSeconds)
+                    timerText = formatTime(remainingSeconds),
+                    progress = remainingSeconds.toFloat() / totalSeconds
                 )
             }
             onReset()
@@ -56,10 +59,11 @@ class TimerViewModel : ViewModel() {
     fun onReset() {
         timerJob?.cancel()
         timerJob = null
-        remainingSeconds = 25*60
+        remainingSeconds = 1*60
         _uiState.value = _uiState.value.copy(
             timerState = TimerState.STOPPED,
-            timerText = formatTime(remainingSeconds)
+            timerText = formatTime(remainingSeconds),
+            progress = 1f
         )
     }
 }

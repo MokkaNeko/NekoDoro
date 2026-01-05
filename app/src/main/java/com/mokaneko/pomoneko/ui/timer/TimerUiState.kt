@@ -5,5 +5,6 @@ data class TimerUiState(
     val timerText: String,
     val section: Int,
     val sectionText: String,
-    val timerState: TimerState
+    val timerState: TimerState,
+    val progress: Float
 )
