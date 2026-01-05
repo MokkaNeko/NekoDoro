@@ -388,7 +388,7 @@ fun TimerCircleBorder(
             width = strokeWidth.toPx(),
             cap = StrokeCap.Round
         )
-        val startAngle = -90f
+        val startAngle = 90f
         val whiteSweep = 360f * progress
         val greySweep = 360f - whiteSweep
         drawArc(
