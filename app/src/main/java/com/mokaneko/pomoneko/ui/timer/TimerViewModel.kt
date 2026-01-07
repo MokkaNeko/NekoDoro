@@ -5,17 +5,22 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mokaneko.pomoneko.data.local.PomodoroPhase
+import com.mokaneko.pomoneko.data.local.PomodoroSettingEntity
+import com.mokaneko.pomoneko.data.repository.PomodoroRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class TimerViewModel : ViewModel() {
+@HiltViewModel
+class TimerViewModel @Inject constructor(private val repository: PomodoroRepository) : ViewModel() {
 
     /* ------------ State ------------ */
     private val _uiState = mutableStateOf(
         TimerUiState(
             taskName = "This cat needs a name",
-            timerText = "1:00",
+            timerText = "25:00",
             section = 4,
             sectionText = "Focus",
             timerState = TimerState.STOPPED,
@@ -26,10 +31,11 @@ class TimerViewModel : ViewModel() {
 
     /* ------------ Variables ------------- */
     private var timerJob: Job? = null
-    private val focusDuration = 1 * 60
-    private val shortBreakDuration = 30
-    private val longBreakDuration = 1 * 60
-    private val totalSection = 4
+    private var focusDuration = 0
+    private var shortBreakDuration = 0
+    private var longBreakDuration = 0
+    private var totalSection = 0
+
 
     private var currentPhase = PomodoroPhase.FOCUS
     private var currentSection = 1
@@ -47,7 +53,7 @@ class TimerViewModel : ViewModel() {
     private fun updateUiState() {
         _uiState.value = _uiState.value.copy(
             timerText = formatTime(remainingSeconds),
-            progress = remainingSeconds.toFloat() / totalSeconds,
+            progress = if (totalSeconds > 0) remainingSeconds.toFloat() / totalSeconds else 0f,
             section = currentSection,
             sectionText = when (currentPhase) {
                 PomodoroPhase.FOCUS -> "Focus"
@@ -56,6 +62,37 @@ class TimerViewModel : ViewModel() {
             }
         )
     }
+
+    private fun applySetting(setting: PomodoroSettingEntity) {
+        focusDuration = setting.focusDuration
+        shortBreakDuration = setting.shortBreakDuration
+        longBreakDuration = setting.longBreakDuration
+        totalSection = setting.totalSection
+
+        currentPhase = PomodoroPhase.FOCUS
+        currentSection = 1
+        totalSeconds = focusDuration
+        remainingSeconds = totalSeconds
+
+        _uiState.value = _uiState.value.copy(
+            taskName = setting.taskName
+        )
+
+        updateUiState()
+    }
+    private suspend fun saveDefaultSetting() {
+        repository.save(
+            PomodoroSettingEntity(
+                taskName = "This cat needs a name",
+                focusDuration = 25*60,
+                shortBreakDuration = 5*60,
+                longBreakDuration = 15*60,
+                totalSection = 4
+            )
+        )
+    }
+
+
 
     /* ------------ functions ------------ */
 
@@ -123,4 +160,38 @@ class TimerViewModel : ViewModel() {
 
         updateUiState()
     }
+
+    fun updateSetting(
+        taskName: String,
+        focus: Int,
+        short: Int,
+        long: Int,
+        section: Int
+    ) {
+        viewModelScope.launch {
+            repository.save(
+                PomodoroSettingEntity(
+                    taskName = taskName,
+                    focusDuration = focus * 60,
+                    shortBreakDuration = short * 60,
+                    longBreakDuration = long * 60,
+                    totalSection = section
+                )
+            )
+        }
+    }
+
+
+    init {
+        viewModelScope.launch {
+            repository.settingFlow.collect { setting ->
+                if (setting != null) {
+                    applySetting(setting)
+                } else {
+                    saveDefaultSetting()
+                }
+            }
+        }
+    }
+
 }
