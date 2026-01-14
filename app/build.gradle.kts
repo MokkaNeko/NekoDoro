@@ -61,9 +61,16 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
-    implementation("androidx.constraintlayout:constraintlayout-compose:1.1.1")
+    implementation(libs.androidx.constraintlayout.compose)
+
+    kapt(libs.hilt.compiler)
+    kapt(libs.androidx.room.compiler)
+
 //    hilt
     implementation(libs.hilt.android)
-    kapt(libs.hilt.compiler)
     implementation(libs.hilt.navigation.compose)
+
+//    Room
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
 }
