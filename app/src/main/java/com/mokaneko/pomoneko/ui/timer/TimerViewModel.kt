@@ -179,6 +179,23 @@ class TimerViewModel @Inject constructor(private val repository: PomodoroReposit
         }
     }
 
+    fun updateTaskName(name: String) {
+        _uiState.value = _uiState.value.copy(taskName = name)
+
+        viewModelScope.launch {
+            repository.save(
+                PomodoroSettingEntity(
+                    taskName = name,
+                    focusDuration = focusDuration,
+                    shortBreakDuration = shortBreakDuration,
+                    longBreakDuration = longBreakDuration,
+                    totalSection = totalSection
+                )
+            )
+        }
+    }
+
+
 
     init {
         viewModelScope.launch {
