@@ -8,6 +8,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -22,15 +23,22 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.UiComposable
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
@@ -42,14 +50,15 @@ import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign.Companion.Center
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.constraintlayout.compose.ConstraintSet
-import androidx.constraintlayout.compose.Dimension
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.mokaneko.pomoneko.R
 import com.mokaneko.pomoneko.data.local.PomodoroPhase
 import com.mokaneko.pomoneko.ui.theme.Green
@@ -57,12 +66,25 @@ import com.mokaneko.pomoneko.ui.theme.Inactive
 import com.mokaneko.pomoneko.ui.theme.Pink
 import com.mokaneko.pomoneko.ui.theme.White
 import com.mokaneko.pomoneko.ui.theme.itim
-import kotlin.concurrent.timer
-
 
 @Composable
 fun TimerScreen(
+    viewModel: TimerViewModel = hiltViewModel()
+){
+    val uiState by viewModel.uiState
+    TimerContent(
+        uiState = uiState,
+        onNameChange = viewModel::updateTaskName,
+        onPlay = viewModel::onPlay,
+        onPause = viewModel::onPause,
+        onReset = viewModel::onReset
+    )
+}
+
+@Composable
+fun TimerContent(
     uiState: TimerUiState,
+    onNameChange: (String) -> Unit,
     onPlay: () -> Unit,
     onPause: () -> Unit,
     onReset: () -> Unit
@@ -106,7 +128,10 @@ fun TimerScreen(
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ){
-                TaskName(name = uiState.taskName)
+                TaskName(
+                    name = uiState.taskName,
+                    onNameChange = onNameChange
+                )
             }
             Box(modifier = Modifier
                 .fillMaxWidth()
@@ -167,15 +192,55 @@ fun TimerScreen(
 
 /*------------------- Name -------------------*/
 @Composable
-fun TaskName(name: String) {
-    Text(
-        modifier = Modifier.layoutId("taskName"),
-        text = name,
-        color = White,
-        fontFamily = itim,
-        fontSize = 20.sp,
-        textAlign = Center
-    )
+fun TaskName(
+    name: String,
+    onNameChange: (String) -> Unit
+    ) {
+    var isEditing by remember { mutableStateOf(false) }
+    var text by remember(name) { mutableStateOf(name) }
+    if (isEditing) {
+        TextField(
+            value = text,
+            onValueChange = {
+                if (it.length <= 20) {
+                    text = it
+                }
+            },
+            singleLine = true,
+            textStyle = TextStyle(
+                color = White,
+                fontFamily = itim,
+                fontSize = 20.sp,
+                textAlign = Center
+            ),
+            modifier = Modifier.widthIn(min = 120.dp, max = 240.dp),
+            keyboardOptions = KeyboardOptions(
+                imeAction = ImeAction.Done
+            ),
+            keyboardActions = KeyboardActions(
+                onDone = {
+                    isEditing = false
+                    onNameChange(text.ifBlank {name})
+                }
+            ),
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = Transparent,
+                unfocusedContainerColor = Transparent,
+                focusedIndicatorColor = White,
+                unfocusedIndicatorColor = Inactive,
+                cursorColor = White
+            )
+        )
+    } else {
+        Text(
+            modifier = Modifier.clickable { isEditing = true },
+            text = name,
+            color = White,
+            fontFamily = itim,
+            fontSize = 20.sp,
+            textAlign = Center
+        )
+    }
 }
 
 /*------------------- Clock -------------------*/
@@ -574,10 +639,5 @@ private val PreviewTimerState = TimerUiState(
 @Preview(showBackground = true)
 @Composable
 fun TimerScreenPreview() {
-    TimerScreen(
-        uiState = PreviewTimerState,
-        onPlay = {},
-        onPause = {},
-        onReset = {}
-    )
+    TimerScreen()
 }

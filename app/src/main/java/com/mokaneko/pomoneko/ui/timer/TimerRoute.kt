@@ -10,10 +10,5 @@ fun TimerRoute(
     modifier: Modifier = Modifier,
     viewModel: TimerViewModel = hiltViewModel()
 ) {
-    TimerScreen(
-        uiState = viewModel.uiState.value,
-        onPlay = viewModel::onPlay,
-        onPause = viewModel::onPause,
-        onReset = viewModel::onReset
-    )
+    TimerScreen()
 }
