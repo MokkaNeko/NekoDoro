@@ -1,19 +1,27 @@
 package com.mokaneko.pomoneko.ui.timer
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -22,6 +30,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.UiComposable
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
@@ -42,10 +51,14 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.ConstraintSet
 import androidx.constraintlayout.compose.Dimension
 import com.mokaneko.pomoneko.R
+import com.mokaneko.pomoneko.data.local.PomodoroPhase
 import com.mokaneko.pomoneko.ui.theme.Green
 import com.mokaneko.pomoneko.ui.theme.Inactive
+import com.mokaneko.pomoneko.ui.theme.Pink
 import com.mokaneko.pomoneko.ui.theme.White
 import com.mokaneko.pomoneko.ui.theme.itim
+import kotlin.concurrent.timer
+
 
 @Composable
 fun TimerScreen(
@@ -53,89 +66,103 @@ fun TimerScreen(
     onPlay: () -> Unit,
     onPause: () -> Unit,
     onReset: () -> Unit
-) {
-
-    /*------------------- Constraint Start -------------------*/
-    val constraints = ConstraintSet {
-
-        val taskName = createRefFor("taskName")
-        val catClock = createRefFor("catClock")
-        val taskTimer = createRefFor("taskTimer")
-        val pomodoroSection = createRefFor("pomodoroSection")
-        val sectionText = createRefFor("sectionText")
-        val timerControl = createRefFor("timerControl")
-        val swipeMenu = createRefFor("swipeMenu")
-
-        val topGuide = createGuidelineFromTop(0.075f)
-        val bottomGuide = createGuidelineFromBottom(0.02f)
-
-        constrain(taskName) {
-            top.linkTo(topGuide)
-            start.linkTo(parent.start)
-            end.linkTo(parent.end)
-            width = Dimension.fillToConstraints
-        }
-
-        constrain(catClock) {
-            top.linkTo(taskName.bottom, 60.dp)
-            start.linkTo(parent.start)
-            end.linkTo(parent.end)
-            width = Dimension.fillToConstraints
-        }
-
-        constrain(taskTimer) {
-            top.linkTo(catClock.bottom, 16.dp)
-            start.linkTo(parent.start)
-            end.linkTo(parent.end)
-        }
-
-        constrain(pomodoroSection) {
-            top.linkTo(taskTimer.bottom, 12.dp)
-            start.linkTo(parent.start)
-            end.linkTo(parent.end)
-            width = Dimension.fillToConstraints
-        }
-
-        constrain(sectionText) {
-            top.linkTo(pomodoroSection.bottom, 12.dp)
-            start.linkTo(parent.start)
-            end.linkTo(parent.end)
-        }
-
-        constrain(timerControl) {
-            top.linkTo(sectionText.bottom, 24.dp)
-            start.linkTo(parent.start)
-            end.linkTo(parent.end)
-        }
-
-        constrain(swipeMenu) {
-            bottom.linkTo(bottomGuide)
-            start.linkTo(parent.start)
-            end.linkTo(parent.end)
-        }
-    }
-
-    ConstraintLayout(
-        constraintSet = constraints,
+){
+    Box(
         modifier = Modifier
-            .fillMaxSize()
             .background(Green)
+            .fillMaxSize()
     ) {
-        TaskName(name = uiState.taskName)
-        CatClock(progress = uiState.progress)
-        TaskTimer(timer = uiState.timerText)
-        PomodoroSection(section = uiState.section)
-        SectionText(currentSection = uiState.sectionText)
-        TimerControl(
-            timerState = uiState.timerState,
-            onPlay = onPlay,
-            onPause = onPause,
-            onReset = onReset
-        )
-//        SwipeMenu()
-    }
+        Column(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Button(
+                    onClick = {},
+                    modifier = Modifier
+                        .padding(start = 10.dp)
+                        .height(20.dp)
+                        .width(24.dp),
+                    shape = RoundedCornerShape(10),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Transparent
+                    ),
+                    contentPadding = PaddingValues(2.dp)
+                ) {
+                    HamburgerIcon(
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
+            }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(3f),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ){
+                TaskName(name = uiState.taskName)
+            }
+            Box(modifier = Modifier
+                .fillMaxWidth()
+                .weight(8f),
+                contentAlignment = Alignment.Center
+            ){
+                CatClock(progress = uiState.progress, phase = uiState.phase, timerState = uiState.timerState)
+            }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                PomodoroSection(
+                    totalSection = uiState.totalSection,
+                    currentSection = uiState.currentSection,
+                    phase = uiState.phase
+                )
+            }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ){
+                TaskTimer(timer = uiState.timerText)
+            }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(3f),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                TimerControl(
+                    timerState = uiState.timerState,
+                    onPlay = onPlay,
+                    onPause = onPause,
+                    onReset = onReset
+                )
+            }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.Top
+            ) {
+                SectionText(currentSection = uiState.phase)
+            }
+        }
 
-    /*------------------- Constraint End -------------------*/
+    }
 }
 
 /*------------------- Name -------------------*/
@@ -153,34 +180,82 @@ fun TaskName(name: String) {
 
 /*------------------- Clock -------------------*/
 @Composable
-fun CatClock(progress: Float) {
+fun CatClock(
+    progress: Float,
+    phase: PomodoroPhase,
+    timerState: TimerState
+) {
     val animatedProgress by animateFloatAsState(
-        targetValue = progress,
+        targetValue = when (timerState) {
+            TimerState.STOPPED -> 0f
+            else -> progress
+        },
+        animationSpec = tween(
+            durationMillis = 1000,
+            easing = FastOutSlowInEasing
+        ),
         label = "TimerProgress"
     )
-    Box(
+    val targetColor = when {
+        timerState == TimerState.STOPPED -> Inactive
+        phase != PomodoroPhase.FOCUS -> Inactive
+        else -> White
+    }
+    val animatedColor by animateColorAsState(
+        targetValue = targetColor,
+        animationSpec = tween(
+            durationMillis = 600,
+            easing = LinearOutSlowInEasing
+        ),
+        label = "CatColor"
+    )
+
+    BoxWithConstraints(
         modifier = Modifier
-            .layoutId("catClock")
             .fillMaxWidth()
             .height(320.dp)
-            .padding(horizontal = 16.dp)
+            .padding(horizontal = 16.dp),
+        contentAlignment = Alignment.Center
     ) {
-        TimerCircleBorder(
-            progress = animatedProgress,
-            modifier = Modifier.size(280.dp).align(Alignment.Center).padding(top = 10.dp),
-            strokeWidth = 18.dp
-        )
-        Image(
-            painter = painterResource(R.drawable.ic_cat_face),
-            contentDescription = "Clock",
-            modifier = Modifier.size(240.dp).align(Alignment.Center).padding(top = 10.dp),
-            colorFilter = ColorFilter.tint(White)
-        )
-        Image(
-            painter = painterResource(R.drawable.ic_cat_ear),
-            contentDescription = "Clock",
-            colorFilter = ColorFilter.tint(White)
-        )
+        val clockSize = maxWidth * 0.75f
+        val faceSize = clockSize * 0.86f
+        val earWidth = clockSize * 1.5f
+        val earOffsetY = -(clockSize * 0.42f)
+        Box(contentAlignment = Alignment.Center) {
+            if (phase == PomodoroPhase.FOCUS) {
+                TimerCircleBorder(
+                    progress = animatedProgress,
+                    modifier = Modifier.size(clockSize),
+                    strokeWidth = 18.dp
+                )
+            } else {
+                TimerCircleBorder(
+                    progress = animatedProgress,
+                    modifier = Modifier.size(clockSize),
+                    strokeWidth = 18.dp,
+                    color1 = Inactive,
+                    color2 = White,
+                    whiteSweep = 360f - 360f * progress,
+                    greySweep = 360f * progress
+                )
+            }
+
+            Image(
+                painter = painterResource(R.drawable.ic_cat_face),
+                contentDescription = null,
+                modifier = Modifier.size(faceSize),
+                colorFilter = ColorFilter.tint(animatedColor)
+            )
+
+            Image(
+                painter = painterResource(R.drawable.ic_cat_ear),
+                contentDescription = null,
+                modifier = Modifier
+                    .size(earWidth)
+                    .offset(y = earOffsetY),
+                colorFilter = ColorFilter.tint(animatedColor)
+            )
+        }
     }
 }
 
@@ -189,105 +264,48 @@ fun CatClock(progress: Float) {
 fun TaskTimer(timer: String) {
     Text(
         modifier = Modifier
-            .layoutId("taskTimer")
-            .padding(top = 20.dp),
+            .layoutId("taskTimer"),
         text = timer,
         color = White,
         fontFamily = itim,
-        fontSize = 32.sp,
+        fontSize = 28.sp,
         textAlign = Center
     )
 }
 
 /*------------------- Pomodoro Section -------------------*/
 @Composable
-fun PomodoroSection(section: Int) {
+fun PomodoroSection(
+    totalSection: Int,
+    currentSection: Int,
+    phase: PomodoroPhase,
+    circleSize: Dp = 36.dp
+) {
     Row(
-        modifier = Modifier
-            .padding(top = 20.dp)
-            .layoutId("pomodoroSection")
-            .fillMaxWidth()
-            .padding(horizontal = 60.dp),
-        horizontalArrangement = Arrangement.SpaceEvenly,
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        if (section < 6) {
-            for (i in 1..section) {
-                Canvas(
-                    modifier = Modifier
-                        .size(20.dp)
-                ) {
-                    drawCircle(color = White)
+        repeat(totalSection) { index ->
+            val sectionNumber = index + 1
+
+            val color = when {
+                sectionNumber < currentSection -> White // completed
+                sectionNumber == currentSection -> {
+                    when (phase) {
+                        PomodoroPhase.FOCUS -> White
+                        PomodoroPhase.SHORT_BREAK,
+                        PomodoroPhase.LONG_BREAK -> Pink
+                    }
                 }
+                else -> Inactive // not started
             }
-        } else {
-            val sectionDivider = section / 2
-            Column(
-                verticalArrangement = Arrangement.Center
+            Canvas(
+                modifier = Modifier
+                    .size(circleSize)
+                    .padding(horizontal = 6.dp)
             ) {
-                if (section % 2 == 0) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 20.dp),
-                        horizontalArrangement = Arrangement.SpaceEvenly
-                    ) {
-                        for (i in 1..sectionDivider) {
-                            Canvas(
-                                modifier = Modifier
-                                    .size(20.dp)
-                            ) {
-                                drawCircle(color = White)
-                            }
-                        }
-                    }
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceEvenly
-                    ) {
-                        for (i in 1..sectionDivider) {
-                            Canvas(
-                                modifier = Modifier
-                                    .size(20.dp)
-                            ) {
-                                drawCircle(color = White)
-                            }
-                        }
-                    }
-                }
-                else {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 12.dp),
-                        horizontalArrangement = Arrangement.SpaceEvenly
-                    ) {
-                        for (i in 1..sectionDivider+1) {
-                            Canvas(
-                                modifier = Modifier
-                                    .size(20.dp)
-                            ) {
-                                drawCircle(color = White)
-                            }
-                        }
-                    }
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 12.dp),
-                        horizontalArrangement = Arrangement.SpaceEvenly
-                    ) {
-                        for (i in 1..sectionDivider) {
-                            Canvas(
-                                modifier = Modifier
-                                    .size(20.dp)
-                            ) {
-                                drawCircle(color = White)
-                            }
-                        }
-                    }
-                }
+                drawCircle(color = color)
             }
         }
     }
@@ -295,15 +313,19 @@ fun PomodoroSection(section: Int) {
 
 /*------------------- Section Text -------------------*/
 @Composable
-fun SectionText(currentSection: String) {
+fun SectionText(currentSection: PomodoroPhase) {
+    val section: String = when(currentSection) {
+        PomodoroPhase.FOCUS -> "Focus"
+        PomodoroPhase.SHORT_BREAK -> "Short Break"
+        PomodoroPhase.LONG_BREAK -> "Long Break"
+    }
     Text(
         modifier = Modifier
-            .padding(top = 20.dp)
             .layoutId("sectionText"),
-        text = currentSection,
+        text = section,
         color = White,
         fontFamily = itim,
-        fontSize = 32.sp,
+        fontSize = 24.sp,
         textAlign = Center
     )
 }
@@ -346,7 +368,9 @@ fun TimerControl(
                 ) { PlayIcon() }
                 Button(
                     onClick = onReset,
-                    modifier = Modifier.align(Alignment.CenterEnd).padding(end = 60.dp),
+                    modifier = Modifier
+                        .align(Alignment.CenterEnd)
+                        .padding(end = 60.dp),
                     shape = RoundedCornerShape(10),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Transparent
@@ -368,38 +392,33 @@ fun TimerControl(
     }
 }
 
-/*------------------- Swipe Menu -------------------*/
-@Composable
-fun SwipeMenu() {
-    SwipeUpIcon()
-}
-
 /*------------------- Icons -------------------*/
 @Composable
 fun TimerCircleBorder(
     progress: Float,
     modifier: Modifier = Modifier,
-    strokeWidth: Dp = 8.dp
+    strokeWidth: Dp = 8.dp,
+    color1: Color = White,
+    color2: Color = Inactive,
+    whiteSweep: Float = 360f * progress,
+    greySweep: Float = 360f - whiteSweep
 ) {
     Canvas(
         modifier = modifier.aspectRatio(1f)
     ) {
         val stroke = Stroke(
-            width = strokeWidth.toPx(),
-            cap = StrokeCap.Round
+            width = strokeWidth.toPx()
         )
         val startAngle = 90f
-        val whiteSweep = 360f * progress
-        val greySweep = 360f - whiteSweep
         drawArc(
-            color = Inactive,
+            color = color2,
             startAngle = startAngle + whiteSweep,
             sweepAngle = greySweep,
             useCenter = false,
             style = stroke
         )
         drawArc(
-            color = White,
+            color = color1,
             startAngle = startAngle,
             sweepAngle = whiteSweep,
             useCenter = false,
@@ -413,7 +432,7 @@ fun PlayIcon(
     color: Color = White
 ) {
     Canvas(
-        modifier = modifier.size(40.dp)
+        modifier = modifier.size(25.dp)
     ) {
         val trianglePath = Path().apply {
             moveTo(size.width, size.height / 2f)
@@ -431,21 +450,24 @@ fun PlayIcon(
 @Composable
 fun PauseIcon(
     modifier: Modifier = Modifier,
-    color: Color = White
+    color: Color = White,
 ) {
     Canvas(
-        modifier = modifier.size(40.dp)
+        modifier = modifier.size(25.dp)
     ) {
         val barWidth = size.width * 0.25f
         val gap = size.width * 0.15f
+        val totalWidth = barWidth*2 + gap
+        val startX = (size.width - totalWidth) / 2
+
         drawRect(
             color = color,
-            topLeft = Offset(0f, 0f),
+            topLeft = Offset(startX, 0f),
             size = Size(barWidth, size.height)
         )
         drawRect(
             color = color,
-            topLeft = Offset(barWidth + gap, 0f),
+            topLeft = Offset(startX + barWidth + gap, 0f),
             size = Size(barWidth, size.height)
         )
     }
@@ -455,7 +477,7 @@ fun ResetIcon(
     modifier: Modifier = Modifier,
     color: Color = White
 ) {
-    Canvas(modifier = modifier.size(24.dp)) {
+    Canvas(modifier = modifier.size(20.dp)) {
         val strokeWidth = size.width * 0.12f
         drawArc(
             color = color,
@@ -475,7 +497,9 @@ fun ResetIcon(
 }
 @Composable
 fun SwipeUpIcon(
+    modifier: Modifier = Modifier,
     color: Color = White,
+    strokeWidth: Float = 12f
 ) {
     Canvas(
         modifier = Modifier
@@ -489,10 +513,52 @@ fun SwipeUpIcon(
                 lineTo(size.width, size.height)
             },
             color = color,
-            style = Stroke(width = 12f, cap = StrokeCap.Round, join = StrokeJoin.Round)
+            style = Stroke(width = strokeWidth, cap = StrokeCap.Round, join = StrokeJoin.Round)
         )
     }
 }
+
+@Composable
+fun HamburgerIcon(
+    modifier: Modifier = Modifier,
+    color: Color = Color.White,
+    strokeWidth: Float = 2f
+) {
+    Canvas(
+        modifier = modifier
+            .size(width = 20.dp, height = 10.dp)
+    ) {
+        val strokePx = strokeWidth.dp.toPx()
+
+        val startX = strokePx / 2
+        val endX = size.width - strokePx / 2
+
+        drawLine(
+            color = color,
+            start = Offset(startX, strokePx / 2),
+            end = Offset(endX, strokePx / 2),
+            strokeWidth = strokePx,
+            cap = StrokeCap.Round
+        )
+
+        drawLine(
+            color = color,
+            start = Offset(startX, size.height / 2),
+            end = Offset(endX, size.height / 2),
+            strokeWidth = strokePx,
+            cap = StrokeCap.Round
+        )
+
+        drawLine(
+            color = color,
+            start = Offset(startX, size.height - strokePx / 2),
+            end = Offset(endX, size.height - strokePx / 2),
+            strokeWidth = strokePx,
+            cap = StrokeCap.Round
+        )
+    }
+}
+
 
 /*------------------- End of Icon -------------------*/
 
@@ -500,10 +566,11 @@ fun SwipeUpIcon(
 private val PreviewTimerState = TimerUiState(
     taskName = "This cat needs a name",
     timerText = "25:00",
-    section = 4,
-    sectionText = "Focus",
-    timerState = TimerState.STOPPED,
-    progress = 1f
+    currentSection = 4,
+    totalSection = 4,
+    phase = PomodoroPhase.LONG_BREAK,
+    timerState = TimerState.RUNNING,
+    progress = 0f
 )
 
 @Preview(showBackground = true)

@@ -21,10 +21,11 @@ class TimerViewModel @Inject constructor(private val repository: PomodoroReposit
         TimerUiState(
             taskName = "This cat needs a name",
             timerText = "25:00",
-            section = 4,
-            sectionText = "Focus",
+            currentSection = 1,
+            totalSection = 4,
+            phase = PomodoroPhase.FOCUS,
             timerState = TimerState.STOPPED,
-            progress = 1f
+            progress = 0f
         )
     )
     val uiState: State<TimerUiState> = _uiState
@@ -54,12 +55,9 @@ class TimerViewModel @Inject constructor(private val repository: PomodoroReposit
         _uiState.value = _uiState.value.copy(
             timerText = formatTime(remainingSeconds),
             progress = if (totalSeconds > 0) remainingSeconds.toFloat() / totalSeconds else 0f,
-            section = currentSection,
-            sectionText = when (currentPhase) {
-                PomodoroPhase.FOCUS -> "Focus"
-                PomodoroPhase.SHORT_BREAK -> "Short Break"
-                PomodoroPhase.LONG_BREAK -> "Long Break"
-            }
+            currentSection = currentSection,
+            totalSection = totalSection,
+            phase = currentPhase
         )
     }
 
@@ -193,5 +191,4 @@ class TimerViewModel @Inject constructor(private val repository: PomodoroReposit
             }
         }
     }
-
 }
