@@ -233,8 +233,6 @@ fun CatClock(
                     progress = animatedProgress,
                     modifier = Modifier.size(clockSize),
                     strokeWidth = 18.dp,
-                    color1 = Inactive,
-                    color2 = White,
                     whiteSweep = 360f - 360f * progress,
                     greySweep = 360f * progress
                 )
