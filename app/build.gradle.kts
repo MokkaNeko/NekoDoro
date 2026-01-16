@@ -62,6 +62,7 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     implementation(libs.androidx.constraintlayout.compose)
+    implementation(libs.androidx.navigation.compose)
 
     kapt(libs.hilt.compiler)
     kapt(libs.androidx.room.compiler)
