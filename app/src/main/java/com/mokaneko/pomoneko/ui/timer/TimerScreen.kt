@@ -58,7 +58,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.mokaneko.pomoneko.R
 import com.mokaneko.pomoneko.data.local.PomodoroPhase
 import com.mokaneko.pomoneko.ui.theme.Green
@@ -69,7 +68,8 @@ import com.mokaneko.pomoneko.ui.theme.itim
 
 @Composable
 fun TimerScreen(
-    viewModel: TimerViewModel = hiltViewModel()
+    viewModel: TimerViewModel = hiltViewModel(),
+    onOpenSettings: () -> Unit
 ){
     val uiState by viewModel.uiState
     TimerContent(
@@ -77,7 +77,8 @@ fun TimerScreen(
         onNameChange = viewModel::updateTaskName,
         onPlay = viewModel::onPlay,
         onPause = viewModel::onPause,
-        onReset = viewModel::onReset
+        onReset = viewModel::onReset,
+        onOpenSettings = onOpenSettings
     )
 }
 
@@ -87,7 +88,8 @@ fun TimerContent(
     onNameChange: (String) -> Unit,
     onPlay: () -> Unit,
     onPause: () -> Unit,
-    onReset: () -> Unit
+    onReset: () -> Unit,
+    onOpenSettings: () -> Unit
 ){
     Box(
         modifier = Modifier
@@ -105,7 +107,7 @@ fun TimerContent(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Button(
-                    onClick = {},
+                    onClick = onOpenSettings,
                     modifier = Modifier
                         .padding(start = 10.dp)
                         .height(20.dp)
@@ -186,7 +188,6 @@ fun TimerContent(
                 SectionText(currentSection = uiState.phase)
             }
         }
-
     }
 }
 
@@ -639,5 +640,7 @@ private val PreviewTimerState = TimerUiState(
 @Preview(showBackground = true)
 @Composable
 fun TimerScreenPreview() {
-    TimerScreen()
+    TimerScreen(
+        onOpenSettings = {}
+    )
 }

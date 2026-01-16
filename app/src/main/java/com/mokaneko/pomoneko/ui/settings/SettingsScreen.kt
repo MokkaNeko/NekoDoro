@@ -36,7 +36,9 @@ import com.mokaneko.pomoneko.ui.timer.ResetIcon
 import com.mokaneko.pomoneko.ui.timer.SwipeUpIcon
 
 @Composable
-fun SettingsScreen() {
+fun SettingsScreen(
+    onBack: () -> Unit
+) {
     Box(
         modifier = Modifier
             .background(Green)
@@ -49,7 +51,15 @@ fun SettingsScreen() {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ) {
-            SwipeDown(modifier = Modifier)
+            Button(
+                onClick = onBack,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Green,
+                    contentColor = White
+                )
+            ) {
+                SwipeDown(modifier = Modifier)
+            }
         }
         Column(
             modifier = Modifier
@@ -595,5 +605,5 @@ fun SwipeDown(modifier: Modifier) {
 @Composable
 @Preview
 fun OptionPreview() {
-    SettingsScreen()
+    SettingsScreen(onBack = {})
 }
