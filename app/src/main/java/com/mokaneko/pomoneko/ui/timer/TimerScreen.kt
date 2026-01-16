@@ -58,6 +58,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.mokaneko.pomoneko.R
 import com.mokaneko.pomoneko.data.local.PomodoroPhase
 import com.mokaneko.pomoneko.ui.theme.Green
@@ -185,9 +186,9 @@ fun TimerContent(
                 SectionText(currentSection = uiState.phase)
             }
         }
+
     }
 }
-
 
 /*------------------- Name -------------------*/
 @Composable
