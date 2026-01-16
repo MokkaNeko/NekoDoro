@@ -6,6 +6,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
-fun TimerRoute() {
+fun TimerRoute(
+    modifier: Modifier = Modifier
+) {
     TimerScreen()
 }
