@@ -26,13 +26,13 @@ import androidx.compose.ui.text.style.TextAlign.Companion.Center
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.mokaneko.pomoneko.ui.common.icons.ResetIcon
 import com.mokaneko.pomoneko.ui.theme.Green
 import com.mokaneko.pomoneko.ui.theme.Lime
 import com.mokaneko.pomoneko.ui.theme.Pink
 import com.mokaneko.pomoneko.ui.theme.White
 import com.mokaneko.pomoneko.ui.theme.itim
 import com.mokaneko.pomoneko.ui.theme.poppins
-import com.mokaneko.pomoneko.ui.timer.ResetIcon
 import com.mokaneko.pomoneko.ui.timer.SwipeUpIcon
 
 @Composable

@@ -7,6 +7,8 @@ import androidx.lifecycle.viewModelScope
 import com.mokaneko.pomoneko.data.local.PomodoroPhase
 import com.mokaneko.pomoneko.data.local.PomodoroSettingEntity
 import com.mokaneko.pomoneko.data.repository.PomodoroRepository
+import com.mokaneko.pomoneko.ui.timer.state.TimerState
+import com.mokaneko.pomoneko.ui.timer.state.TimerUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
