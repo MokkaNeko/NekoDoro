@@ -4,8 +4,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -19,6 +19,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -26,28 +28,34 @@ import androidx.compose.ui.text.style.TextAlign.Companion.Center
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import com.mokaneko.pomoneko.ui.common.icons.BackChevronIcon
 import com.mokaneko.pomoneko.ui.common.icons.ResetIcon
+import com.mokaneko.pomoneko.ui.settings.components.AdditionalComponents
+import com.mokaneko.pomoneko.ui.settings.components.DurationComponents
+import com.mokaneko.pomoneko.ui.settings.components.SettingsSessionCounts
+import com.mokaneko.pomoneko.ui.settings.components.Switch
 import com.mokaneko.pomoneko.ui.theme.Green
 import com.mokaneko.pomoneko.ui.theme.Lime
 import com.mokaneko.pomoneko.ui.theme.Pink
+import com.mokaneko.pomoneko.ui.theme.SemiTransparent
 import com.mokaneko.pomoneko.ui.theme.White
 import com.mokaneko.pomoneko.ui.theme.itim
 import com.mokaneko.pomoneko.ui.theme.poppins
-import com.mokaneko.pomoneko.ui.timer.SwipeUpIcon
 
 @Composable
 fun SettingsScreen(
     onBack: () -> Unit
 ) {
+    var sessionCount by rememberSaveable { mutableStateOf(4) }
+
     Box(
         modifier = Modifier
             .background(Green)
             .fillMaxSize()
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(40.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ) {
@@ -58,7 +66,7 @@ fun SettingsScreen(
                     contentColor = White
                 )
             ) {
-                SwipeDown(modifier = Modifier)
+                BackChevronIcon()
             }
         }
         Column(
@@ -69,7 +77,7 @@ fun SettingsScreen(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            //Durations
+            /* ~~~~~~~~~~~~~ Durations ~~~~~~~~~~~~ */
             Text(
                 modifier = Modifier.padding(vertical = 20.dp),
                 text = "Durations",
@@ -90,31 +98,13 @@ fun SettingsScreen(
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Button(
-                        onClick = { /* TODO: Add click action */ },
-                        modifier = Modifier
-                            .height(90.dp)
-                            .width(90.dp),
-                        shape = RoundedCornerShape(10),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Lime,
-                            contentColor = White
-                        )
-                    ) {
-                        Text(
-                            text = "25",
-                            color = White,
-                            fontFamily = itim,
-                            fontSize = 35.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
+                    DurationComponents(duration = 25)
                     Text(
                         modifier = Modifier.padding(top = 8.dp),
                         text = "Focus",
                         color = White,
                         fontFamily = poppins,
-                        fontSize = 16.sp,
+                        fontSize = 14.sp,
                         textAlign = Center,
                         fontWeight = FontWeight.Medium
                     )
@@ -124,31 +114,13 @@ fun SettingsScreen(
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Button(
-                        onClick = { /* TODO: Add click action */ },
-                        modifier = Modifier
-                            .height(90.dp)
-                            .width(90.dp),
-                        shape = RoundedCornerShape(10),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Lime,
-                            contentColor = White
-                        )
-                    ) {
-                        Text(
-                            text = "25",
-                            color = White,
-                            fontFamily = itim,
-                            fontSize = 35.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
+                    DurationComponents(duration = 5)
                     Text(
                         modifier = Modifier.padding(top = 8.dp),
                         text = "Short Break",
                         color = White,
                         fontFamily = poppins,
-                        fontSize = 16.sp,
+                        fontSize = 14.sp,
                         textAlign = Center,
                         fontWeight = FontWeight.Medium
                     )
@@ -158,31 +130,13 @@ fun SettingsScreen(
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Button(
-                        onClick = { /* TODO: Add click action */ },
-                        modifier = Modifier
-                            .height(90.dp)
-                            .width(90.dp),
-                        shape = RoundedCornerShape(10),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Lime,
-                            contentColor = White
-                        )
-                    ) {
-                        Text(
-                            text = "25",
-                            color = White,
-                            fontFamily = itim,
-                            fontSize = 35.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
+                    DurationComponents(duration = 15)
                     Text(
                         modifier = Modifier.padding(top = 8.dp),
                         text = "Long Break",
                         color = White,
                         fontFamily = poppins,
-                        fontSize = 16.sp,
+                        fontSize = 14.sp,
                         textAlign = Center,
                         fontWeight = FontWeight.Medium
                     )
@@ -199,7 +153,7 @@ fun SettingsScreen(
                         .width(90.dp),
                     shape = RoundedCornerShape(10),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Lime,
+                        containerColor = SemiTransparent,
                         contentColor = White
                     )
                 ) {
@@ -210,235 +164,43 @@ fun SettingsScreen(
                     text = "Reset Duration",
                     color = White,
                     fontFamily = poppins,
-                    fontSize = 16.sp,
+                    fontSize = 14.sp,
                     textAlign = Center,
                     fontWeight = FontWeight.Medium
                 )
             }
 
-            //Pomodoro Counts
+            /* ~~~~~~~~~~~~~ Session Counts ~~~~~~~~~~~~ */
             Text(
                 modifier = Modifier.padding(vertical = 20.dp),
-                text = "Pomodoro Counts",
+                text = "Session Counts",
                 color = White,
                 fontFamily = poppins,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 textAlign = Center
             )
-            Box(
-                modifier = Modifier
-                    .background(Lime, shape = RoundedCornerShape(10))
-                    .height(90.dp)
-                    .fillMaxWidth(),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "3",
-                    color = White,
-                    fontFamily = itim,
-                    fontSize = 35.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-
+            SettingsSessionCounts(
+                sessionCount = sessionCount,
+                onSessionChange = { sessionCount = it }
+            )
             //Auto Start
             Text(
                 modifier = Modifier.padding(vertical = 20.dp),
-                text = "Auto Start",
+                text = "Others",
                 color = White,
                 fontFamily = poppins,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 textAlign = Center
             )
-            Box(
-                modifier = Modifier
-                    .background(Lime, shape = RoundedCornerShape(10))
-                    .padding(vertical = 10.dp)
-                    .fillMaxWidth(),
-                contentAlignment = Alignment.Center
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxSize(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        modifier = Modifier.padding(start = 10.dp),
-                        text = "Auto Start Pomodoro",
-                        color = White,
-                        fontFamily = itim,
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Medium
-                    )
-                    Box(
-                        modifier = Modifier
-                            .padding(end = 10.dp)
-                            .background(Pink, shape = RoundedCornerShape(40))
-                            .height(40.dp)
-                            .width(100.dp),
-                    )
-                }
-            }
-            Box(
-                modifier = Modifier
-                    .padding(top = 20.dp)
-                    .background(Lime, shape = RoundedCornerShape(10))
-                    .padding(vertical = 10.dp)
-                    .fillMaxWidth(),
-                contentAlignment = Alignment.Center
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxSize(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        modifier = Modifier.padding(start = 10.dp),
-                        text = "Auto Start Break",
-                        color = White,
-                        fontFamily = itim,
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Medium
-                    )
-                    Box(
-                        modifier = Modifier
-                            .padding(end = 10.dp)
-                            .background(Pink, shape = RoundedCornerShape(40))
-                            .height(40.dp)
-                            .width(100.dp),
-                    )
-                }
-            }
-
-            //Notification
-            Text(
-                modifier = Modifier.padding(vertical = 20.dp),
-                text = "Notification",
-                color = White,
-                fontFamily = poppins,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                textAlign = Center
-            )
-            Box(
-                modifier = Modifier
-                    .background(Lime, shape = RoundedCornerShape(10))
-                    .padding(vertical = 10.dp)
-                    .fillMaxWidth(),
-                contentAlignment = Alignment.Center
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxSize(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        modifier = Modifier.padding(start = 10.dp),
-                        text = "Vibration",
-                        color = White,
-                        fontFamily = itim,
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Medium
-                    )
-                    Box(
-                        modifier = Modifier
-                            .padding(end = 10.dp)
-                            .background(Pink, shape = RoundedCornerShape(40))
-                            .height(40.dp)
-                            .width(100.dp),
-                    )
-                }
-            }
-            Box(
-                modifier = Modifier
-                    .padding(top = 20.dp)
-                    .background(Lime, shape = RoundedCornerShape(10))
-                    .padding(vertical = 10.dp)
-                    .fillMaxWidth(),
-                contentAlignment = Alignment.Center
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxSize(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        modifier = Modifier.padding(start = 10.dp),
-                        text = "Alarm",
-                        color = White,
-                        fontFamily = itim,
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Medium
-                    )
-                    Box(
-                        modifier = Modifier
-                            .padding(end = 10.dp)
-                            .background(Pink, shape = RoundedCornerShape(40))
-                            .height(40.dp)
-                            .width(100.dp),
-                    )
-                }
-            }
-
-            //Profile
-            Text(
-                modifier = Modifier.padding(vertical = 20.dp),
-                text = "Profile",
-                color = White,
-                fontFamily = poppins,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                textAlign = Center
-            )
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Button(
-                    onClick = { /* TODO: Add save profile action */ },
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(end = 10.dp),
-                    shape = RoundedCornerShape(20),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Lime,
-                        contentColor = White
-                    ),
-                    contentPadding = PaddingValues(vertical = 15.dp)
-                ) {
-                    Text(
-                        text = "Save Profile",
-                        color = White,
-                        fontFamily = itim,
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Medium
-                    )
-                }
-                Button(
-                    onClick = { /* TODO: Add save profile action */ },
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(start = 10.dp),
-                    shape = RoundedCornerShape(20),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Lime,
-                        contentColor = White
-                    ),
-                    contentPadding = PaddingValues(vertical = 15.dp)
-                ) {
-                    Text(
-                        text = "Load Profile",
-                        color = White,
-                        fontFamily = itim,
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Medium
-                    )
-                }
-            }
+            Switch("Auto Start Focus")
+            Spacer(modifier = Modifier.height(15.dp))
+            Switch("Auto Start Break")
+            Spacer(modifier = Modifier.height(15.dp))
+            Switch("Vibration")
+            Spacer(modifier = Modifier.height(15.dp))
+            Switch("Stay Awake")
 
             //Reset to Default
             Text(
@@ -460,14 +222,14 @@ fun SettingsScreen(
                     containerColor = Pink,
                     contentColor = White
                 )
-            )  {
+            ) {
                 ResetIcon(modifier = Modifier.size(40.dp))
             }
 
             //Others
             Text(
                 modifier = Modifier.padding(vertical = 20.dp),
-                text = "Others",
+                text = "Additional",
                 color = White,
                 fontFamily = poppins,
                 fontSize = 20.sp,
@@ -485,25 +247,7 @@ fun SettingsScreen(
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Button(
-                        onClick = { /* TODO: Add click action */ },
-                        modifier = Modifier
-                            .height(90.dp)
-                            .width(90.dp),
-                        shape = RoundedCornerShape(10),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Lime,
-                            contentColor = White
-                        )
-                    ) {
-                        Text(
-                            text = "?",
-                            color = White,
-                            fontFamily = itim,
-                            fontSize = 35.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
+                    AdditionalComponents(text = "?")
                     Text(
                         modifier = Modifier.padding(top = 8.dp),
                         text = "What is \npomodoro",
@@ -513,31 +257,14 @@ fun SettingsScreen(
                         textAlign = Center,
                         fontWeight = FontWeight.Medium
                     )
+
                 }
                 Column(
                     modifier = Modifier.padding(bottom = 10.dp),
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Button(
-                        onClick = { /* TODO: Add click action */ },
-                        modifier = Modifier
-                            .height(90.dp)
-                            .width(90.dp),
-                        shape = RoundedCornerShape(10),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Lime,
-                            contentColor = White
-                        )
-                    ) {
-                        Text(
-                            text = "?",
-                            color = White,
-                            fontFamily = itim,
-                            fontSize = 35.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
+                    AdditionalComponents(text = "?")
                     Text(
                         modifier = Modifier.padding(top = 8.dp),
                         text = "How to \nuse",
@@ -553,24 +280,7 @@ fun SettingsScreen(
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Button(
-                        onClick = { /* TODO: Add click action */ },
-                        modifier = Modifier
-                            .height(90.dp)
-                            .width(90.dp),
-                        shape = RoundedCornerShape(10),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Lime,
-                            contentColor = White
-                        )
-                    ) {
-                        Text(
-                            text = "Rate",
-                            color = White,
-                            fontFamily = itim,
-                            fontSize = 20.sp
-                        )
-                    }
+                    AdditionalComponents(text = "Rate", fontSize = 20)
                     Text(
                         modifier = Modifier.padding(top = 8.dp),
                         text = "Rate \nus",
@@ -593,14 +303,11 @@ fun SettingsScreen(
                 textAlign = Center,
                 fontWeight = FontWeight.Medium
             )
+
         }
     }
 }
 
-@Composable
-fun SwipeDown(modifier: Modifier) {
-    SwipeUpIcon()
-}
 
 @Composable
 @Preview
