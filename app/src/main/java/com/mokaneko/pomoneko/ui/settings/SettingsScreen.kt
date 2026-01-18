@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.mokaneko.pomoneko.ui.common.icons.BackChevronIcon
 import com.mokaneko.pomoneko.ui.common.icons.ResetIcon
 import com.mokaneko.pomoneko.ui.settings.components.AdditionalComponents
@@ -37,17 +38,17 @@ import com.mokaneko.pomoneko.ui.settings.components.DurationComponents
 import com.mokaneko.pomoneko.ui.settings.components.SettingsSessionCounts
 import com.mokaneko.pomoneko.ui.settings.components.Switch
 import com.mokaneko.pomoneko.ui.theme.Green
-import com.mokaneko.pomoneko.ui.theme.Lime
 import com.mokaneko.pomoneko.ui.theme.Pink
 import com.mokaneko.pomoneko.ui.theme.SemiTransparent
 import com.mokaneko.pomoneko.ui.theme.White
-import com.mokaneko.pomoneko.ui.theme.itim
 import com.mokaneko.pomoneko.ui.theme.poppins
 
 @Composable
 fun SettingsScreen(
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    viewModel: SettingsViewModel = hiltViewModel()
 ) {
+    val uiState by viewModel.uiState
     var sessionCount by rememberSaveable { mutableStateOf(4) }
 
     Box(
@@ -98,7 +99,11 @@ fun SettingsScreen(
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    DurationComponents(duration = 25)
+                    DurationComponents(
+                        duration = uiState.focusDuration,
+                        onPlusClick = { viewModel.updateFocusDuration(+1) },
+                        onMinusClick = { viewModel.updateFocusDuration(-1)}
+                    )
                     Text(
                         modifier = Modifier.padding(top = 8.dp),
                         text = "Focus",
@@ -114,7 +119,11 @@ fun SettingsScreen(
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    DurationComponents(duration = 5)
+                    DurationComponents(
+                        duration = uiState.shortBreakDuration,
+                        onPlusClick = { viewModel.updateShortBreakDuration(+1) },
+                        onMinusClick = { viewModel.updateShortBreakDuration(-1)}
+                    )
                     Text(
                         modifier = Modifier.padding(top = 8.dp),
                         text = "Short Break",
@@ -130,7 +139,11 @@ fun SettingsScreen(
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    DurationComponents(duration = 15)
+                    DurationComponents(
+                        duration = uiState.longBreakDuration,
+                        onPlusClick = { viewModel.updateLongBreakDuration(+1) },
+                        onMinusClick = { viewModel.updateLongBreakDuration(-1)}
+                    )
                     Text(
                         modifier = Modifier.padding(top = 8.dp),
                         text = "Long Break",
@@ -184,7 +197,7 @@ fun SettingsScreen(
                 sessionCount = sessionCount,
                 onSessionChange = { sessionCount = it }
             )
-            //Auto Start
+            /* ~~~~~~~~~~~~~ Others ~~~~~~~~~~~~ */
             Text(
                 modifier = Modifier.padding(vertical = 20.dp),
                 text = "Others",
@@ -202,7 +215,7 @@ fun SettingsScreen(
             Spacer(modifier = Modifier.height(15.dp))
             Switch("Stay Awake")
 
-            //Reset to Default
+            /* ~~~~~~~~~~~~~ Reset ~~~~~~~~~~~~ */
             Text(
                 modifier = Modifier.padding(vertical = 20.dp),
                 text = "Reset To Default",
@@ -226,7 +239,7 @@ fun SettingsScreen(
                 ResetIcon(modifier = Modifier.size(40.dp))
             }
 
-            //Others
+            /* ~~~~~~~~~~~~~ Additional ~~~~~~~~~~~~~~*/
             Text(
                 modifier = Modifier.padding(vertical = 20.dp),
                 text = "Additional",

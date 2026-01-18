@@ -125,6 +125,8 @@ class TimerViewModel @Inject constructor(private val repository: PomodoroReposit
     fun onPlay() {
         if (timerJob != null) return
 
+        repository.updateTimerState(TimerState.RUNNING)
+
         _uiState.value = uiState.value.copy(
             timerState = TimerState.RUNNING
         )
@@ -143,11 +145,14 @@ class TimerViewModel @Inject constructor(private val repository: PomodoroReposit
     fun onPause() {
         timerJob?.cancel()
         timerJob = null
+        repository.updateTimerState(TimerState.PAUSED)
         _uiState.value = _uiState.value.copy(timerState = TimerState.PAUSED)
     }
     fun onReset() {
         timerJob?.cancel()
         timerJob = null
+
+        repository.updateTimerState(TimerState.STOPPED)
 
         currentPhase = PomodoroPhase.FOCUS
         currentSection = 1
@@ -159,26 +164,6 @@ class TimerViewModel @Inject constructor(private val repository: PomodoroReposit
         )
 
         updateUiState()
-    }
-
-    fun updateSetting(
-        taskName: String,
-        focus: Int,
-        short: Int,
-        long: Int,
-        section: Int
-    ) {
-        viewModelScope.launch {
-            repository.save(
-                PomodoroSettingEntity(
-                    taskName = taskName,
-                    focusDuration = focus * 60,
-                    shortBreakDuration = short * 60,
-                    longBreakDuration = long * 60,
-                    totalSection = section
-                )
-            )
-        }
     }
 
     fun updateTaskName(name: String) {

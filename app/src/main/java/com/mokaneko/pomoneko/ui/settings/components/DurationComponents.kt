@@ -51,7 +51,7 @@ fun DurationComponents(
             verticalArrangement = Arrangement.SpaceBetween
         ){
             Button(
-                onClick = { onPlusClick },
+                onClick = onPlusClick,
                 modifier = Modifier.size(20.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Transparent,
@@ -69,7 +69,7 @@ fun DurationComponents(
                 fontWeight = FontWeight.Bold
             )
             Button(
-                onClick = { onMinusClick },
+                onClick = onMinusClick,
                 modifier = Modifier.size(20.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Transparent,
