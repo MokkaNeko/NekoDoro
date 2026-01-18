@@ -1,4 +1,4 @@
-package com.mokaneko.pomoneko.ui.timer
+package com.mokaneko.pomoneko.ui.timer.state
 
 import com.mokaneko.pomoneko.data.local.PomodoroPhase
 

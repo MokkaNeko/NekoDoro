@@ -17,5 +17,7 @@ val Inactive = Color(0xFF7F7F7F)
 val Green = Color(0xFFB8DB80)
 val Pink = Color(0xAAF39EB6)
 val Lime = Color(0x80F7F6D3)
+val SemiTransparent = Color(0x50FFFFFF)
+val Transparent = Color(0x00FFFFFF)
 
 // Dark Colors (Coming Soon)
