@@ -64,7 +64,13 @@ fun SettingSwitch(
             Switch(
                 checked = checked,
                 onCheckedChange = onCheckedChange,
-                colors = SwitchDefaults.colors(checkedTrackColor = Pink, uncheckedTrackColor = SemiTransparent, uncheckedBorderColor = White, uncheckedThumbColor = White)
+                colors = SwitchDefaults.colors(
+                    checkedTrackColor = Pink,
+                    checkedThumbColor = White,
+                    uncheckedTrackColor = SemiTransparent,
+                    uncheckedBorderColor = White,
+                    uncheckedThumbColor = White
+                )
             )
         }
     }

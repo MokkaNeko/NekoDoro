@@ -12,4 +12,6 @@ data class PomodoroSettingEntity(
     val longBreakDuration: Int,
     val totalSection: Int,
     val autoStartSession: Boolean = true,
+    val vibrationEnabled: Boolean = true,
+    val stayAwake: Boolean = false
 )

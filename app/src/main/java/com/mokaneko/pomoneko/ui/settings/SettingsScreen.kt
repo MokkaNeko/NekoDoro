@@ -233,39 +233,15 @@ fun SettingsScreen(
             Spacer(modifier = Modifier.height(15.dp))
             SettingSwitch(
                 "Vibration",
-                checked = true,
-                onCheckedChange = {}
+                checked = uiState.vibrationEnabled,
+                onCheckedChange = {viewModel.updateVibration(it)}
             )
             Spacer(modifier = Modifier.height(15.dp))
             SettingSwitch(
                 "Stay Awake",
-                checked = true,
-                onCheckedChange = {}
+                checked = uiState.stayAwake,
+                onCheckedChange = {viewModel.updateStayAwake(it)}
             )
-
-            /* ~~~~~~~~~~~~~ Reset ~~~~~~~~~~~~ */
-            Text(
-                modifier = Modifier.padding(vertical = 20.dp),
-                text = "Reset To Default",
-                color = White,
-                fontFamily = poppins,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                textAlign = Center
-            )
-            Button(
-                onClick = { /* TODO: Add reset to default action */ },
-                modifier = Modifier
-                    .height(90.dp)
-                    .width(90.dp),
-                shape = RoundedCornerShape(10),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Pink,
-                    contentColor = White
-                )
-            ) {
-                ResetIcon(modifier = Modifier.size(40.dp))
-            }
 
             /* ~~~~~~~~~~~~~ Additional ~~~~~~~~~~~~~~*/
             Text(

@@ -5,5 +5,7 @@ data class SettingsUiState(
     val shortBreakDuration: Int = 5,
     val longBreakDuration: Int = 15,
     val totalSection: Int = 4,
-    val autoStartSession: Boolean = true
+    val autoStartSession: Boolean = true,
+    val vibrationEnabled: Boolean = true,
+    val stayAwake: Boolean = false
 )

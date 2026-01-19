@@ -74,6 +74,25 @@ class SettingsViewModel @Inject constructor(
         )
     }
 
+    fun updateVibration(enabled: Boolean) {
+        _uiState.value = _uiState.value.copy(vibrationEnabled = enabled)
+
+        viewModelScope.launch {
+            repository.save(
+                PomodoroSettingEntity(
+                    taskName = "This cat needs a name",
+                    focusDuration = _uiState.value.focusDuration * 60,
+                    shortBreakDuration = _uiState.value.shortBreakDuration * 60,
+                    longBreakDuration = _uiState.value.longBreakDuration * 60,
+                    totalSection = _uiState.value.totalSection,
+                    autoStartSession = _uiState.value.autoStartSession,
+                    vibrationEnabled = enabled
+                )
+            )
+        }
+    }
+
+
 
     fun updateFocusDuration(delta: Int) {
         if (_isTimerRunning.value) {
@@ -169,6 +188,26 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
+    fun updateStayAwake(enabled: Boolean) {
+        _uiState.value = _uiState.value.copy(stayAwake = enabled)
+
+        viewModelScope.launch {
+            repository.save(
+                PomodoroSettingEntity(
+                    taskName = "This cat needs a name",
+                    focusDuration = _uiState.value.focusDuration * 60,
+                    shortBreakDuration = _uiState.value.shortBreakDuration * 60,
+                    longBreakDuration = _uiState.value.longBreakDuration * 60,
+                    totalSection = _uiState.value.totalSection,
+                    autoStartSession = _uiState.value.autoStartSession,
+                    vibrationEnabled = _uiState.value.vibrationEnabled,
+                    stayAwake = enabled
+                )
+            )
+        }
+    }
+
+
 
 
 
@@ -186,7 +225,9 @@ class SettingsViewModel @Inject constructor(
                         shortBreakDuration = setting.shortBreakDuration / 60,
                         longBreakDuration = setting.longBreakDuration / 60,
                         totalSection = setting.totalSection,
-                        autoStartSession = setting.autoStartSession
+                        autoStartSession = setting.autoStartSession,
+                        vibrationEnabled = setting.vibrationEnabled,
+                        stayAwake = setting.stayAwake
                     )
                 }
             }
