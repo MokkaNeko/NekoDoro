@@ -172,6 +172,7 @@ class TimerViewModel @Inject constructor(private val repository: PomodoroReposit
         viewModelScope.launch {
             repository.save(
                 PomodoroSettingEntity(
+
                     taskName = name,
                     focusDuration = focusDuration,
                     shortBreakDuration = shortBreakDuration,

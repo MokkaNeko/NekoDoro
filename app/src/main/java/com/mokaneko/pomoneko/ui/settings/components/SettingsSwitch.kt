@@ -1,0 +1,26 @@
+package com.mokaneko.pomoneko.ui.settings.components
+
+import androidx.compose.material3.Switch
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
+
+@Composable
+fun SettingsSwitch(modifier : Modifier = Modifier) {
+    var checked by remember { mutableStateOf(true) }
+    Switch(
+        modifier = modifier,
+        checked = checked,
+        onCheckedChange = { checked = it }
+    )
+}
+
+@Preview
+@Composable
+fun SettingsSwitchPreview() {
+    SettingsSwitch()
+}

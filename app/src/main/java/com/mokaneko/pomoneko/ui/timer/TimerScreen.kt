@@ -111,7 +111,11 @@ fun TimerContent(
                 .weight(8f),
                 contentAlignment = Alignment.Center
             ){
-                CatClock(progress = uiState.progress, phase = uiState.phase, timerState = uiState.timerState)
+                CatClock(
+                    progress = uiState.progress,
+                    phase = uiState.phase,
+                    timerState = uiState.timerState
+                )
             }
             Row(
                 modifier = Modifier

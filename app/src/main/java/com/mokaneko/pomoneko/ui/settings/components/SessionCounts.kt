@@ -26,13 +26,14 @@ import com.mokaneko.pomoneko.ui.theme.itim
 
 @Composable
 fun SettingsSessionCounts(
+    modifier: Modifier = Modifier,
     sessionCount: Int,
     onSessionChange: (Int) -> Unit,
     minSession: Int = 1,
     maxSession: Int = 8
 ) {
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .background(SemiTransparent, shape = RoundedCornerShape(10))
             .height(100.dp),

@@ -15,10 +15,13 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -29,7 +32,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.draw.alpha
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.mokaneko.pomoneko.ui.common.icons.BackChevronIcon
 import com.mokaneko.pomoneko.ui.common.icons.ResetIcon
@@ -49,7 +54,15 @@ fun SettingsScreen(
     viewModel: SettingsViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState
-    var sessionCount by rememberSaveable { mutableStateOf(4) }
+    val sessionCount = uiState.totalSection
+    val isTimerRunning by viewModel.isTimerRunning
+    var showAlert by remember {mutableStateOf(false)}
+
+    LaunchedEffect(Unit) {
+        viewModel.showResetAlert.collect {
+            showAlert = true
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -102,7 +115,8 @@ fun SettingsScreen(
                     DurationComponents(
                         duration = uiState.focusDuration,
                         onPlusClick = { viewModel.updateFocusDuration(+1) },
-                        onMinusClick = { viewModel.updateFocusDuration(-1)}
+                        onMinusClick = { viewModel.updateFocusDuration(-1)},
+                        modifier = Modifier.alpha(if (isTimerRunning) 0.5f else 1f)
                     )
                     Text(
                         modifier = Modifier.padding(top = 8.dp),
@@ -122,7 +136,8 @@ fun SettingsScreen(
                     DurationComponents(
                         duration = uiState.shortBreakDuration,
                         onPlusClick = { viewModel.updateShortBreakDuration(+1) },
-                        onMinusClick = { viewModel.updateShortBreakDuration(-1)}
+                        onMinusClick = { viewModel.updateShortBreakDuration(-1)},
+                        modifier = Modifier.alpha(if (isTimerRunning) 0.5f else 1f)
                     )
                     Text(
                         modifier = Modifier.padding(top = 8.dp),
@@ -142,7 +157,8 @@ fun SettingsScreen(
                     DurationComponents(
                         duration = uiState.longBreakDuration,
                         onPlusClick = { viewModel.updateLongBreakDuration(+1) },
-                        onMinusClick = { viewModel.updateLongBreakDuration(-1)}
+                        onMinusClick = { viewModel.updateLongBreakDuration(-1)},
+                        modifier = Modifier.alpha(if (isTimerRunning) 0.5f else 1f)
                     )
                     Text(
                         modifier = Modifier.padding(top = 8.dp),
@@ -160,10 +176,11 @@ fun SettingsScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Button(
-                    onClick = { /* TODO: Add click action */ },
+                    onClick = { viewModel.resetDurations() },
                     modifier = Modifier
                         .height(90.dp)
-                        .width(90.dp),
+                        .width(90.dp)
+                        .alpha(if(isTimerRunning) 0.5f else 1f),
                     shape = RoundedCornerShape(10),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = SemiTransparent,
@@ -195,7 +212,9 @@ fun SettingsScreen(
             )
             SettingsSessionCounts(
                 sessionCount = sessionCount,
-                onSessionChange = { sessionCount = it }
+                onSessionChange = {viewModel.updateTotalSection(it)},
+                modifier = Modifier.alpha(if (isTimerRunning) 0.5f else 1f)
+
             )
             /* ~~~~~~~~~~~~~ Others ~~~~~~~~~~~~ */
             Text(
@@ -207,6 +226,8 @@ fun SettingsScreen(
                 fontWeight = FontWeight.Bold,
                 textAlign = Center
             )
+            Switch("Auto Start Session")
+            Spacer(modifier = Modifier.height(15.dp))
             Switch("Auto Start Focus")
             Spacer(modifier = Modifier.height(15.dp))
             Switch("Auto Start Break")
@@ -316,6 +337,40 @@ fun SettingsScreen(
                 textAlign = Center,
                 fontWeight = FontWeight.Medium
             )
+            if (showAlert) {
+                AlertDialog(
+                    containerColor = SemiTransparent,
+                    onDismissRequest = { showAlert = false },
+                    title = {
+                        Text(
+                            "Timer is running",
+                            fontSize = 16.sp
+                        )
+                    },
+                    text = {
+                        Text(
+                            text = "Reset the timer to change the durations",
+                            fontSize = 12.sp
+                        )
+                    },
+                    confirmButton = {
+                        TextButton(
+                            onClick = { showAlert = false },
+                            colors = ButtonDefaults.textButtonColors(
+                                containerColor = Pink
+                            ),
+                            shape = RoundedCornerShape(25)
+                        ) {
+                            Text(
+                                "OK",
+                                color = White,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 20.sp
+                            )
+                        }
+                    }
+                )
+            }
 
         }
     }

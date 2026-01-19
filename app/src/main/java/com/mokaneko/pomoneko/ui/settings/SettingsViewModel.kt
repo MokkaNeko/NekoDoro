@@ -8,23 +8,27 @@ import com.mokaneko.pomoneko.data.local.PomodoroSettingEntity
 import com.mokaneko.pomoneko.data.repository.PomodoroRepository
 import com.mokaneko.pomoneko.ui.timer.state.TimerState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
 private const val MIN_DURATION = 1
 private const val MAX_DURATION = 120
+private const val DEFAULT_FOCUS = 25
+private const val DEFAULT_SHORT = 5
+private const val DEFAULT_LONG = 15
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
     private val repository: PomodoroRepository
 ) : ViewModel() {
-
-
     private val _uiState = mutableStateOf(SettingsUiState())
     val uiState: State<SettingsUiState> = _uiState
     private val _isTimerRunning = mutableStateOf(false)
     val isTimerRunning: State<Boolean> = _isTimerRunning
+    private val _showResetAlert = MutableSharedFlow<Unit>()
+    val showResetAlert = _showResetAlert
 
 
     private fun clampDuration(value: Int): Int {
@@ -55,9 +59,29 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
+    fun resetDurations() {
+        if (_isTimerRunning.value) {
+            viewModelScope.launch {
+                _showResetAlert.emit(Unit)
+            }
+            return
+        }
+
+        updateAndSave(
+            focus = DEFAULT_FOCUS,
+            short = DEFAULT_SHORT,
+            long = DEFAULT_LONG
+        )
+    }
+
 
     fun updateFocusDuration(delta: Int) {
-        if (_isTimerRunning.value) return
+        if (_isTimerRunning.value) {
+            viewModelScope.launch{
+                _showResetAlert.emit(Unit)
+            }
+            return
+        }
 
         val newValue = clampDuration(_uiState.value.focusDuration + delta)
         updateAndSave(
@@ -68,7 +92,12 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun updateShortBreakDuration(delta: Int) {
-        if (_isTimerRunning.value) return
+        if (_isTimerRunning.value) {
+            viewModelScope.launch{
+                _showResetAlert.emit(Unit)
+            }
+            return
+        }
 
         val newValue = clampDuration(_uiState.value.shortBreakDuration + delta)
         updateAndSave(
@@ -79,7 +108,12 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun updateLongBreakDuration(delta: Int) {
-        if (_isTimerRunning.value) return
+        if (_isTimerRunning.value) {
+            viewModelScope.launch{
+                _showResetAlert.emit(Unit)
+            }
+            return
+        }
 
         val newValue = clampDuration(_uiState.value.longBreakDuration + delta)
         updateAndSave(
@@ -88,6 +122,34 @@ class SettingsViewModel @Inject constructor(
             long = newValue
         )
     }
+
+    fun updateTotalSection(newSection: Int) {
+        if (_isTimerRunning.value) {
+            viewModelScope.launch {
+                _showResetAlert.emit(Unit)
+            }
+            return
+        }
+
+        val clamped = newSection.coerceIn(1, 8)
+
+        _uiState.value = _uiState.value.copy(
+            totalSection = clamped
+        )
+
+        viewModelScope.launch {
+            repository.save(
+                PomodoroSettingEntity(
+                    taskName = "This cat needs a name",
+                    focusDuration = _uiState.value.focusDuration * 60,
+                    shortBreakDuration = _uiState.value.shortBreakDuration * 60,
+                    longBreakDuration = _uiState.value.longBreakDuration * 60,
+                    totalSection = clamped
+                )
+            )
+        }
+    }
+
 
 
     init {
