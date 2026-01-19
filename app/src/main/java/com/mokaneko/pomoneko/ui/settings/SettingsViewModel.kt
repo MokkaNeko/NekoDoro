@@ -150,6 +150,26 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
+    fun updateAutoStartSession(enabled: Boolean) {
+        _uiState.value = _uiState.value.copy(
+            autoStartSession = enabled
+        )
+
+        viewModelScope.launch {
+            repository.save(
+                PomodoroSettingEntity(
+                    taskName = "This cat needs a name",
+                    focusDuration = _uiState.value.focusDuration * 60,
+                    shortBreakDuration = _uiState.value.shortBreakDuration * 60,
+                    longBreakDuration = _uiState.value.longBreakDuration * 60,
+                    totalSection = _uiState.value.totalSection,
+                    autoStartSession = enabled
+                )
+            )
+        }
+    }
+
+
 
 
     init {
@@ -165,7 +185,8 @@ class SettingsViewModel @Inject constructor(
                         focusDuration = setting.focusDuration / 60,
                         shortBreakDuration = setting.shortBreakDuration / 60,
                         longBreakDuration = setting.longBreakDuration / 60,
-                        totalSection = setting.totalSection
+                        totalSection = setting.totalSection,
+                        autoStartSession = setting.autoStartSession
                     )
                 }
             }

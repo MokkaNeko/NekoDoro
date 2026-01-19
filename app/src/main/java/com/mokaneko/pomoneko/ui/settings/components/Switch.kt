@@ -37,10 +37,11 @@ import com.mokaneko.pomoneko.ui.theme.White
 import com.mokaneko.pomoneko.ui.theme.itim
 
 @Composable
-fun Switch(
-    text: String
+fun SettingSwitch(
+    text: String,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit
 ) {
-    var checked by remember { mutableStateOf(true) }
     Box(
         modifier = Modifier
             .background(SemiTransparent, shape = RoundedCornerShape(10))
@@ -62,15 +63,15 @@ fun Switch(
             )
             Switch(
                 checked = checked,
-                onCheckedChange = { checked = it },
+                onCheckedChange = onCheckedChange,
                 colors = SwitchDefaults.colors(checkedTrackColor = Pink, uncheckedTrackColor = SemiTransparent, uncheckedBorderColor = White, uncheckedThumbColor = White)
             )
         }
     }
 }
 
-@Composable
-@Preview
-fun PreviewSwitch() {
-    Switch("Test")
-}
+//@Composable
+//@Preview
+//fun PreviewSwitch() {
+//    SettingSwitch("Test")
+//}

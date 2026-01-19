@@ -23,7 +23,6 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -40,8 +39,8 @@ import com.mokaneko.pomoneko.ui.common.icons.BackChevronIcon
 import com.mokaneko.pomoneko.ui.common.icons.ResetIcon
 import com.mokaneko.pomoneko.ui.settings.components.AdditionalComponents
 import com.mokaneko.pomoneko.ui.settings.components.DurationComponents
+import com.mokaneko.pomoneko.ui.settings.components.SettingSwitch
 import com.mokaneko.pomoneko.ui.settings.components.SettingsSessionCounts
-import com.mokaneko.pomoneko.ui.settings.components.Switch
 import com.mokaneko.pomoneko.ui.theme.Green
 import com.mokaneko.pomoneko.ui.theme.Pink
 import com.mokaneko.pomoneko.ui.theme.SemiTransparent
@@ -226,15 +225,23 @@ fun SettingsScreen(
                 fontWeight = FontWeight.Bold,
                 textAlign = Center
             )
-            Switch("Auto Start Session")
+            SettingSwitch(
+                "Auto Start Session",
+                checked = uiState.autoStartSession,
+                onCheckedChange = { viewModel.updateAutoStartSession(it) }
+            )
             Spacer(modifier = Modifier.height(15.dp))
-            Switch("Auto Start Focus")
+            SettingSwitch(
+                "Vibration",
+                checked = true,
+                onCheckedChange = {}
+            )
             Spacer(modifier = Modifier.height(15.dp))
-            Switch("Auto Start Break")
-            Spacer(modifier = Modifier.height(15.dp))
-            Switch("Vibration")
-            Spacer(modifier = Modifier.height(15.dp))
-            Switch("Stay Awake")
+            SettingSwitch(
+                "Stay Awake",
+                checked = true,
+                onCheckedChange = {}
+            )
 
             /* ~~~~~~~~~~~~~ Reset ~~~~~~~~~~~~ */
             Text(
@@ -371,7 +378,6 @@ fun SettingsScreen(
                     }
                 )
             }
-
         }
     }
 }

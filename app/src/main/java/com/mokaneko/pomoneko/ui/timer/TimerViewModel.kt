@@ -44,6 +44,7 @@ class TimerViewModel @Inject constructor(private val repository: PomodoroReposit
     private var currentSection = 1
     private var totalSeconds = focusDuration
     private var remainingSeconds = totalSeconds
+    private var autoStartSession: Boolean = true
 
     /* ----------- Helpers ------------- */
     private fun formatTime(seconds: Int): String {
@@ -68,6 +69,7 @@ class TimerViewModel @Inject constructor(private val repository: PomodoroReposit
         shortBreakDuration = setting.shortBreakDuration
         longBreakDuration = setting.longBreakDuration
         totalSection = setting.totalSection
+        autoStartSession = setting.autoStartSession
 
         currentPhase = PomodoroPhase.FOCUS
         currentSection = 1
@@ -95,9 +97,46 @@ class TimerViewModel @Inject constructor(private val repository: PomodoroReposit
 
 
     /* ------------ functions ------------ */
+    private fun resetAndStop() {
+        timerJob?.cancel()
+        timerJob = null
 
-    private fun moveToNextPhase() {
-        when (currentPhase) {
+        currentPhase = PomodoroPhase.FOCUS
+        currentSection = 1
+        totalSeconds = focusDuration
+        remainingSeconds = totalSeconds
+
+        repository.updateTimerState(TimerState.STOPPED)
+
+        _uiState.value = _uiState.value.copy(
+            timerState = TimerState.STOPPED
+        )
+
+        updateUiState()
+    }
+
+
+    private fun resetToFirstSession() {
+        currentSection = 1
+        currentPhase = PomodoroPhase.FOCUS
+        totalSeconds = focusDuration
+        remainingSeconds = totalSeconds
+        updateUiState()
+    }
+
+    private fun stopTimerCompletely() {
+        timerJob?.cancel()
+        timerJob = null
+
+        repository.updateTimerState(TimerState.STOPPED)
+
+        _uiState.value = _uiState.value.copy(
+            timerState = TimerState.STOPPED
+        )
+    }
+
+    private fun moveToNextPhase(): Boolean {
+        return when (currentPhase) {
             PomodoroPhase.FOCUS -> {
                 if (currentSection == totalSection) {
                     currentPhase = PomodoroPhase.LONG_BREAK
@@ -106,27 +145,34 @@ class TimerViewModel @Inject constructor(private val repository: PomodoroReposit
                     currentPhase = PomodoroPhase.SHORT_BREAK
                     totalSeconds = shortBreakDuration
                 }
+                remainingSeconds = totalSeconds
+                updateUiState()
+                true
             }
             PomodoroPhase.SHORT_BREAK -> {
                 currentSection++
                 currentPhase = PomodoroPhase.FOCUS
                 totalSeconds = focusDuration
+                remainingSeconds = totalSeconds
+                updateUiState()
+                true
             }
             PomodoroPhase.LONG_BREAK -> {
-                currentSection = 1
-                currentPhase = PomodoroPhase.FOCUS
-                totalSeconds = focusDuration
+                if(autoStartSession) {
+                    resetToFirstSession()
+                    true
+                } else {
+                    resetAndStop()
+                    false
+                }
             }
         }
-        remainingSeconds = totalSeconds
-        updateUiState()
     }
 
     fun onPlay() {
         if (timerJob != null) return
 
         repository.updateTimerState(TimerState.RUNNING)
-
         _uiState.value = uiState.value.copy(
             timerState = TimerState.RUNNING
         )
@@ -137,9 +183,11 @@ class TimerViewModel @Inject constructor(private val repository: PomodoroReposit
                 remainingSeconds--
                 updateUiState()
             }
-            moveToNextPhase()
             timerJob = null
-            onPlay()
+            val shouldContinue = moveToNextPhase()
+            if (shouldContinue) {
+                onPlay()
+            }
         }
     }
     fun onPause() {
