@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -80,6 +81,12 @@ class TimerViewModel @Inject constructor(private val repository: PomodoroReposit
         autoStartSession = setting.autoStartSession
         vibrationEnabled = setting.vibrationEnabled
 
+        if (_uiState.value.taskName != setting.taskName) {
+            _uiState.value = _uiState.value.copy(
+                taskName = setting.taskName
+            )
+        }
+
         val durationChanged =
             focusDuration != setting.focusDuration ||
                     shortBreakDuration != setting.shortBreakDuration ||
@@ -107,6 +114,8 @@ class TimerViewModel @Inject constructor(private val repository: PomodoroReposit
                 shortBreakDuration = 5*60,
                 longBreakDuration = 15*60,
                 totalSection = 4,
+                autoStartSession = true,
+                vibrationEnabled = true,
                 stayAwake = false
             )
         )
@@ -245,16 +254,12 @@ class TimerViewModel @Inject constructor(private val repository: PomodoroReposit
         _uiState.value = _uiState.value.copy(taskName = name)
 
         viewModelScope.launch {
-            repository.save(
-                PomodoroSettingEntity(
-
-                    taskName = name,
-                    focusDuration = focusDuration,
-                    shortBreakDuration = shortBreakDuration,
-                    longBreakDuration = longBreakDuration,
-                    totalSection = totalSection
+            val setting = repository.settingFlow.first()
+            if (setting != null) {
+                repository.save(
+                    setting.copy(taskName = name)
                 )
-            )
+            }
         }
     }
 

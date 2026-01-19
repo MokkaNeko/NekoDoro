@@ -1,9 +1,9 @@
 package com.mokaneko.pomoneko.ui.timer.components
 
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.LinearOutSlowInEasing
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
@@ -14,7 +14,11 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
@@ -32,17 +36,42 @@ fun CatClock(
     phase: PomodoroPhase,
     timerState: TimerState
 ) {
-    val animatedProgress by animateFloatAsState(
-        targetValue = when (timerState) {
-            TimerState.STOPPED -> 0f
-            else -> progress
-        },
-        animationSpec = tween(
-            durationMillis = 1000,
-            easing = FastOutSlowInEasing
-        ),
-        label = "TimerProgress"
-    )
+    val animatedProgress = remember { Animatable(progress) }
+
+    var lastPhase by remember { mutableStateOf(phase) }
+    var latchedVisualProgress by remember { mutableStateOf(0f) }
+
+    LaunchedEffect(progress, timerState) {
+        if (timerState == TimerState.STOPPED) {
+            animatedProgress.animateTo(
+                targetValue = 0f,
+                animationSpec = tween(600, easing = LinearEasing)
+            )
+        } else {
+            animatedProgress.animateTo(
+                targetValue = progress,
+                animationSpec = tween(1000, easing = LinearEasing)
+            )
+        }
+    }
+
+    val rawVisualProgress = when (phase) {
+        PomodoroPhase.FOCUS -> animatedProgress.value
+        else -> 1f - animatedProgress.value
+    }
+
+    LaunchedEffect(phase, rawVisualProgress) {
+        latchedVisualProgress = rawVisualProgress
+        lastPhase = phase
+    }
+
+    val visualProgress =
+        if (phase != lastPhase) {
+            latchedVisualProgress
+        } else {
+            rawVisualProgress
+        }
+
     val targetColor = when {
         timerState == TimerState.STOPPED -> Inactive
         phase != PomodoroPhase.FOCUS -> Inactive
@@ -69,21 +98,11 @@ fun CatClock(
         val earWidth = clockSize * 1.5f
         val earOffsetY = -(clockSize * 0.42f)
         Box(contentAlignment = Alignment.Center) {
-            if (phase == PomodoroPhase.FOCUS) {
-                TimerCircleBorder(
-                    progress = animatedProgress,
-                    modifier = Modifier.size(clockSize),
-                    strokeWidth = 18.dp
-                )
-            } else {
-                TimerCircleBorder(
-                    progress = animatedProgress,
-                    modifier = Modifier.size(clockSize),
-                    strokeWidth = 18.dp,
-                    whiteSweep = 360f - 360f * progress,
-                    greySweep = 360f * progress
-                )
-            }
+            TimerCircleBorder(
+                progress = visualProgress,
+                modifier = Modifier.size(clockSize),
+                strokeWidth = 18.dp
+            )
 
             Image(
                 painter = painterResource(R.drawable.ic_cat_face),

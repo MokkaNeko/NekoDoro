@@ -9,6 +9,7 @@ import com.mokaneko.pomoneko.data.repository.PomodoroRepository
 import com.mokaneko.pomoneko.ui.timer.state.TimerState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -35,6 +36,27 @@ class SettingsViewModel @Inject constructor(
         return value.coerceIn(MIN_DURATION, MAX_DURATION)
     }
 
+    private fun saveCurrentSetting() {
+        val s = _uiState.value
+        viewModelScope.launch {
+            val currentSetting = repository.settingFlow.first()
+
+            if (currentSetting != null) {
+                repository.save(
+                    currentSetting.copy(
+                        focusDuration = s.focusDuration * 60,
+                        shortBreakDuration = s.shortBreakDuration * 60,
+                        longBreakDuration = s.longBreakDuration * 60,
+                        totalSection = s.totalSection,
+                        autoStartSession = s.autoStartSession,
+                        vibrationEnabled = s.vibrationEnabled,
+                        stayAwake = s.stayAwake
+                    )
+                )
+            }
+        }
+    }
+
     private fun updateAndSave(
         focus: Int,
         short: Int,
@@ -45,18 +67,7 @@ class SettingsViewModel @Inject constructor(
             shortBreakDuration = short,
             longBreakDuration = long
         )
-
-        viewModelScope.launch {
-            repository.save(
-                PomodoroSettingEntity(
-                    taskName = "This cat needs a name",
-                    focusDuration = focus * 60,
-                    shortBreakDuration = short * 60,
-                    longBreakDuration = long * 60,
-                    totalSection = _uiState.value.totalSection
-                )
-            )
-        }
+        saveCurrentSetting()
     }
 
     fun resetDurations() {
@@ -73,26 +84,6 @@ class SettingsViewModel @Inject constructor(
             long = DEFAULT_LONG
         )
     }
-
-    fun updateVibration(enabled: Boolean) {
-        _uiState.value = _uiState.value.copy(vibrationEnabled = enabled)
-
-        viewModelScope.launch {
-            repository.save(
-                PomodoroSettingEntity(
-                    taskName = "This cat needs a name",
-                    focusDuration = _uiState.value.focusDuration * 60,
-                    shortBreakDuration = _uiState.value.shortBreakDuration * 60,
-                    longBreakDuration = _uiState.value.longBreakDuration * 60,
-                    totalSection = _uiState.value.totalSection,
-                    autoStartSession = _uiState.value.autoStartSession,
-                    vibrationEnabled = enabled
-                )
-            )
-        }
-    }
-
-
 
     fun updateFocusDuration(delta: Int) {
         if (_isTimerRunning.value) {
@@ -155,56 +146,22 @@ class SettingsViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(
             totalSection = clamped
         )
-
-        viewModelScope.launch {
-            repository.save(
-                PomodoroSettingEntity(
-                    taskName = "This cat needs a name",
-                    focusDuration = _uiState.value.focusDuration * 60,
-                    shortBreakDuration = _uiState.value.shortBreakDuration * 60,
-                    longBreakDuration = _uiState.value.longBreakDuration * 60,
-                    totalSection = clamped
-                )
-            )
-        }
+        saveCurrentSetting()
     }
 
     fun updateAutoStartSession(enabled: Boolean) {
-        _uiState.value = _uiState.value.copy(
-            autoStartSession = enabled
-        )
+        _uiState.value = _uiState.value.copy(autoStartSession = enabled)
+        saveCurrentSetting()
+    }
 
-        viewModelScope.launch {
-            repository.save(
-                PomodoroSettingEntity(
-                    taskName = "This cat needs a name",
-                    focusDuration = _uiState.value.focusDuration * 60,
-                    shortBreakDuration = _uiState.value.shortBreakDuration * 60,
-                    longBreakDuration = _uiState.value.longBreakDuration * 60,
-                    totalSection = _uiState.value.totalSection,
-                    autoStartSession = enabled
-                )
-            )
-        }
+    fun updateVibration(enabled: Boolean) {
+        _uiState.value = _uiState.value.copy(vibrationEnabled = enabled)
+        saveCurrentSetting()
     }
 
     fun updateStayAwake(enabled: Boolean) {
         _uiState.value = _uiState.value.copy(stayAwake = enabled)
-
-        viewModelScope.launch {
-            repository.save(
-                PomodoroSettingEntity(
-                    taskName = "This cat needs a name",
-                    focusDuration = _uiState.value.focusDuration * 60,
-                    shortBreakDuration = _uiState.value.shortBreakDuration * 60,
-                    longBreakDuration = _uiState.value.longBreakDuration * 60,
-                    totalSection = _uiState.value.totalSection,
-                    autoStartSession = _uiState.value.autoStartSession,
-                    vibrationEnabled = _uiState.value.vibrationEnabled,
-                    stayAwake = enabled
-                )
-            )
-        }
+        saveCurrentSetting()
     }
 
 
