@@ -1,7 +1,7 @@
 package com.mokaneko.pomoneko.ui.timer.components
 
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import com.mokaneko.pomoneko.R
 import com.mokaneko.pomoneko.data.local.PomodoroPhase
 import com.mokaneko.pomoneko.ui.theme.Inactive
+import com.mokaneko.pomoneko.ui.theme.SemiTransparent
 import com.mokaneko.pomoneko.ui.theme.White
 import com.mokaneko.pomoneko.ui.timer.state.TimerState
 
@@ -33,16 +34,33 @@ fun CatClock(
     timerState: TimerState
 ) {
     val animatedProgress by animateFloatAsState(
-        targetValue = when (timerState) {
-            TimerState.STOPPED -> 0f
-            else -> progress
+        targetValue = if (timerState == TimerState.STOPPED) 0f else progress,
+        animationSpec = if (timerState == TimerState.STOPPED) {
+            tween(1000)
+        } else {
+            tween(durationMillis = 1000, easing = LinearEasing)
         },
-        animationSpec = tween(
-            durationMillis = 1000,
-            easing = FastOutSlowInEasing
-        ),
         label = "TimerProgress"
     )
+    val activeColor = when (phase) {
+        PomodoroPhase.FOCUS -> White
+        PomodoroPhase.SHORT_BREAK, PomodoroPhase.LONG_BREAK -> Inactive
+    }
+    val animatedActiveColor by animateColorAsState(
+        targetValue = if (timerState == TimerState.STOPPED) Inactive else activeColor,
+        animationSpec = tween(1000),
+        label = "PhaseColor"
+    )
+    val inactiveColor = when (phase) {
+        PomodoroPhase.FOCUS -> Inactive
+        PomodoroPhase.SHORT_BREAK, PomodoroPhase.LONG_BREAK -> SemiTransparent
+    }
+    val animatedInactiveColor by animateColorAsState(
+        targetValue = if (timerState == TimerState.STOPPED) Inactive else inactiveColor,
+        animationSpec = tween(1000),
+        label = "PhaseColor"
+    )
+
     val targetColor = when {
         timerState == TimerState.STOPPED -> Inactive
         phase != PomodoroPhase.FOCUS -> Inactive
@@ -69,21 +87,13 @@ fun CatClock(
         val earWidth = clockSize * 1.5f
         val earOffsetY = -(clockSize * 0.42f)
         Box(contentAlignment = Alignment.Center) {
-            if (phase == PomodoroPhase.FOCUS) {
-                TimerCircleBorder(
-                    progress = animatedProgress,
-                    modifier = Modifier.size(clockSize),
-                    strokeWidth = 18.dp
-                )
-            } else {
-                TimerCircleBorder(
-                    progress = animatedProgress,
-                    modifier = Modifier.size(clockSize),
-                    strokeWidth = 18.dp,
-                    whiteSweep = 360f - 360f * progress,
-                    greySweep = 360f * progress
-                )
-            }
+            TimerCircleBorder(
+                progress = animatedProgress,
+                modifier = Modifier.size(clockSize),
+                strokeWidth = 18.dp,
+                color1 = animatedActiveColor,
+                color2 = animatedInactiveColor
+            )
 
             Image(
                 painter = painterResource(R.drawable.ic_cat_face),

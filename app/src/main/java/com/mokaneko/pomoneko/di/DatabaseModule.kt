@@ -23,7 +23,9 @@ object DatabaseModule {
         context,
         AppDatabase::class.java,
         "pomodoro_db"
-    ).build()
+    )
+        .fallbackToDestructiveMigration()
+        .build()
 
     @Provides
     fun providePomodoroSettingDao(db: AppDatabase): PomodoroSettingDao = db.pomodoroSettingDao()

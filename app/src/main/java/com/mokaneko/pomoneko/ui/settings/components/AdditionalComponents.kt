@@ -23,7 +23,7 @@ fun AdditionalComponents(
     onClick: () -> Unit = {}
 ) {
     Button(
-        onClick = { onClick },
+        onClick = onClick,
         modifier = modifier
             .height(90.dp)
             .width(90.dp),

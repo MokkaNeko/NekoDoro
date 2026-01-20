@@ -15,12 +15,14 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -29,15 +31,18 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.draw.alpha
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.mokaneko.pomoneko.ui.common.icons.BackChevronIcon
 import com.mokaneko.pomoneko.ui.common.icons.ResetIcon
 import com.mokaneko.pomoneko.ui.settings.components.AdditionalComponents
 import com.mokaneko.pomoneko.ui.settings.components.DurationComponents
+import com.mokaneko.pomoneko.ui.settings.components.SettingSwitch
 import com.mokaneko.pomoneko.ui.settings.components.SettingsSessionCounts
-import com.mokaneko.pomoneko.ui.settings.components.Switch
 import com.mokaneko.pomoneko.ui.theme.Green
+import com.mokaneko.pomoneko.ui.theme.NotReallyTransparent
 import com.mokaneko.pomoneko.ui.theme.Pink
 import com.mokaneko.pomoneko.ui.theme.SemiTransparent
 import com.mokaneko.pomoneko.ui.theme.White
@@ -49,7 +54,16 @@ fun SettingsScreen(
     viewModel: SettingsViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState
-    var sessionCount by rememberSaveable { mutableStateOf(4) }
+    val sessionCount = uiState.totalSection
+    val isTimerRunning by viewModel.isTimerRunning
+    var showAlert by remember { mutableStateOf(false) }
+    var showPomodoroInfo by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        viewModel.showResetAlert.collect {
+            showAlert = true
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -102,7 +116,8 @@ fun SettingsScreen(
                     DurationComponents(
                         duration = uiState.focusDuration,
                         onPlusClick = { viewModel.updateFocusDuration(+1) },
-                        onMinusClick = { viewModel.updateFocusDuration(-1)}
+                        onMinusClick = { viewModel.updateFocusDuration(-1) },
+                        modifier = Modifier.alpha(if (isTimerRunning) 0.5f else 1f)
                     )
                     Text(
                         modifier = Modifier.padding(top = 8.dp),
@@ -122,7 +137,8 @@ fun SettingsScreen(
                     DurationComponents(
                         duration = uiState.shortBreakDuration,
                         onPlusClick = { viewModel.updateShortBreakDuration(+1) },
-                        onMinusClick = { viewModel.updateShortBreakDuration(-1)}
+                        onMinusClick = { viewModel.updateShortBreakDuration(-1) },
+                        modifier = Modifier.alpha(if (isTimerRunning) 0.5f else 1f)
                     )
                     Text(
                         modifier = Modifier.padding(top = 8.dp),
@@ -142,7 +158,8 @@ fun SettingsScreen(
                     DurationComponents(
                         duration = uiState.longBreakDuration,
                         onPlusClick = { viewModel.updateLongBreakDuration(+1) },
-                        onMinusClick = { viewModel.updateLongBreakDuration(-1)}
+                        onMinusClick = { viewModel.updateLongBreakDuration(-1) },
+                        modifier = Modifier.alpha(if (isTimerRunning) 0.5f else 1f)
                     )
                     Text(
                         modifier = Modifier.padding(top = 8.dp),
@@ -160,10 +177,11 @@ fun SettingsScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Button(
-                    onClick = { /* TODO: Add click action */ },
+                    onClick = { viewModel.resetDurations() },
                     modifier = Modifier
                         .height(90.dp)
-                        .width(90.dp),
+                        .width(90.dp)
+                        .alpha(if (isTimerRunning) 0.5f else 1f),
                     shape = RoundedCornerShape(10),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = SemiTransparent,
@@ -195,7 +213,9 @@ fun SettingsScreen(
             )
             SettingsSessionCounts(
                 sessionCount = sessionCount,
-                onSessionChange = { sessionCount = it }
+                onSessionChange = { viewModel.updateTotalSection(it) },
+                modifier = Modifier.alpha(if (isTimerRunning) 0.5f else 1f)
+
             )
             /* ~~~~~~~~~~~~~ Others ~~~~~~~~~~~~ */
             Text(
@@ -207,37 +227,23 @@ fun SettingsScreen(
                 fontWeight = FontWeight.Bold,
                 textAlign = Center
             )
-            Switch("Auto Start Focus")
-            Spacer(modifier = Modifier.height(15.dp))
-            Switch("Auto Start Break")
-            Spacer(modifier = Modifier.height(15.dp))
-            Switch("Vibration")
-            Spacer(modifier = Modifier.height(15.dp))
-            Switch("Stay Awake")
-
-            /* ~~~~~~~~~~~~~ Reset ~~~~~~~~~~~~ */
-            Text(
-                modifier = Modifier.padding(vertical = 20.dp),
-                text = "Reset To Default",
-                color = White,
-                fontFamily = poppins,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                textAlign = Center
+            SettingSwitch(
+                "Auto Start Session",
+                checked = uiState.autoStartSession,
+                onCheckedChange = { viewModel.updateAutoStartSession(it) }
             )
-            Button(
-                onClick = { /* TODO: Add reset to default action */ },
-                modifier = Modifier
-                    .height(90.dp)
-                    .width(90.dp),
-                shape = RoundedCornerShape(10),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Pink,
-                    contentColor = White
-                )
-            ) {
-                ResetIcon(modifier = Modifier.size(40.dp))
-            }
+            Spacer(modifier = Modifier.height(15.dp))
+            SettingSwitch(
+                "Vibration",
+                checked = uiState.vibrationEnabled,
+                onCheckedChange = { viewModel.updateVibration(it) }
+            )
+            Spacer(modifier = Modifier.height(15.dp))
+            SettingSwitch(
+                "Stay Awake",
+                checked = uiState.stayAwake,
+                onCheckedChange = { viewModel.updateStayAwake(it) }
+            )
 
             /* ~~~~~~~~~~~~~ Additional ~~~~~~~~~~~~~~*/
             Text(
@@ -260,7 +266,10 @@ fun SettingsScreen(
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    AdditionalComponents(text = "?")
+                    AdditionalComponents(
+                        text = "?",
+                        onClick = { showPomodoroInfo = true }
+                    )
                     Text(
                         modifier = Modifier.padding(top = 8.dp),
                         text = "What is \npomodoro",
@@ -316,6 +325,85 @@ fun SettingsScreen(
                 textAlign = Center,
                 fontWeight = FontWeight.Medium
             )
+            if (showAlert) {
+                AlertDialog(
+                    containerColor = NotReallyTransparent,
+                    onDismissRequest = { showAlert = false },
+                    title = {
+                        Text(
+                            "Timer is running",
+                            fontSize = 16.sp
+                        )
+                    },
+                    text = {
+                        Text(
+                            text = "Reset the timer to change the durations",
+                            fontSize = 12.sp
+                        )
+                    },
+                    confirmButton = {
+                        TextButton(
+                            onClick = { showAlert = false },
+                            colors = ButtonDefaults.textButtonColors(
+                                containerColor = Pink
+                            ),
+                            shape = RoundedCornerShape(25)
+                        ) {
+                            Text(
+                                "OK",
+                                color = White,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 20.sp
+                            )
+                        }
+                    }
+                )
+            }
+            if (showPomodoroInfo) {
+                AlertDialog(
+                    containerColor = NotReallyTransparent,
+                    onDismissRequest = { showPomodoroInfo = false },
+                    title = {
+                        Text(
+                            text = "What is Pomodoro?",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = White
+                        )
+                    },
+                    text = {
+                        Text(
+                            text = """
+Pomodoro Technique is a time management method that helps you stay focused and productive.
+
+It works by breaking work into focused sessions (usually 25 minutes), followed by short breaks.
+
+After several focus sessions, you take a longer break to rest and recharge.
+
+This method helps reduce burnout, improve concentration, and make large tasks feel more manageable.
+                """.trimIndent(),
+                            fontSize = 14.sp,
+                            color = White
+                        )
+                    },
+                    confirmButton = {
+                        TextButton(
+                            onClick = { showPomodoroInfo = false },
+                            colors = ButtonDefaults.textButtonColors(
+                                containerColor = Pink
+                            ),
+                            shape = RoundedCornerShape(25)
+                        ) {
+                            Text(
+                                text = "OK",
+                                color = White,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 18.sp
+                            )
+                        }
+                    }
+                )
+            }
 
         }
     }

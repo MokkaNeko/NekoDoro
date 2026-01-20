@@ -1,5 +1,7 @@
 package com.mokaneko.pomoneko.ui.timer
 
+import android.app.Activity
+import android.view.WindowManager
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,17 +18,23 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.layout.layoutId
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign.Companion.Center
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.mokaneko.pomoneko.data.local.PomodoroPhase
+import com.mokaneko.pomoneko.domain.event.TimerEvent
 import com.mokaneko.pomoneko.ui.common.icons.HamburgerIcon
 import com.mokaneko.pomoneko.ui.theme.Green
 import com.mokaneko.pomoneko.ui.theme.White
@@ -36,6 +44,7 @@ import com.mokaneko.pomoneko.ui.timer.components.PomodoroSection
 import com.mokaneko.pomoneko.ui.timer.components.TaskName
 import com.mokaneko.pomoneko.ui.timer.components.TimerControl
 import com.mokaneko.pomoneko.ui.timer.state.TimerUiState
+import com.mokaneko.pomoneko.util.VibrationHelper
 
 @Composable
 fun TimerScreen(
@@ -43,6 +52,32 @@ fun TimerScreen(
     onOpenSettings: () -> Unit
 ){
     val uiState by viewModel.uiState
+    val context = LocalContext.current
+    val vibrator = remember { VibrationHelper(context) }
+    val activity = context as Activity
+    val stayAwake by viewModel.stayAwake.collectAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.event.collect {event ->
+            when (event) {
+                is TimerEvent.PhaseChanged -> {
+                    vibrator.vibrateShort()
+                }
+            }
+        }
+    }
+
+    DisposableEffect(stayAwake) {
+        if (stayAwake) {
+            activity.window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        } else {
+            activity.window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        }
+        onDispose {
+            activity.window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        }
+    }
+
     TimerContent(
         uiState = uiState,
         onNameChange = viewModel::updateTaskName,
@@ -111,7 +146,11 @@ fun TimerContent(
                 .weight(8f),
                 contentAlignment = Alignment.Center
             ){
-                CatClock(progress = uiState.progress, phase = uiState.phase, timerState = uiState.timerState)
+                CatClock(
+                    progress = uiState.progress,
+                    phase = uiState.phase,
+                    timerState = uiState.timerState
+                )
             }
             Row(
                 modifier = Modifier
