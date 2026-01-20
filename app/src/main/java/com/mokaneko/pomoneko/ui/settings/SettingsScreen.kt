@@ -42,6 +42,7 @@ import com.mokaneko.pomoneko.ui.settings.components.DurationComponents
 import com.mokaneko.pomoneko.ui.settings.components.SettingSwitch
 import com.mokaneko.pomoneko.ui.settings.components.SettingsSessionCounts
 import com.mokaneko.pomoneko.ui.theme.Green
+import com.mokaneko.pomoneko.ui.theme.NotReallyTransparent
 import com.mokaneko.pomoneko.ui.theme.Pink
 import com.mokaneko.pomoneko.ui.theme.SemiTransparent
 import com.mokaneko.pomoneko.ui.theme.White
@@ -55,7 +56,8 @@ fun SettingsScreen(
     val uiState by viewModel.uiState
     val sessionCount = uiState.totalSection
     val isTimerRunning by viewModel.isTimerRunning
-    var showAlert by remember {mutableStateOf(false)}
+    var showAlert by remember { mutableStateOf(false) }
+    var showPomodoroInfo by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         viewModel.showResetAlert.collect {
@@ -114,7 +116,7 @@ fun SettingsScreen(
                     DurationComponents(
                         duration = uiState.focusDuration,
                         onPlusClick = { viewModel.updateFocusDuration(+1) },
-                        onMinusClick = { viewModel.updateFocusDuration(-1)},
+                        onMinusClick = { viewModel.updateFocusDuration(-1) },
                         modifier = Modifier.alpha(if (isTimerRunning) 0.5f else 1f)
                     )
                     Text(
@@ -135,7 +137,7 @@ fun SettingsScreen(
                     DurationComponents(
                         duration = uiState.shortBreakDuration,
                         onPlusClick = { viewModel.updateShortBreakDuration(+1) },
-                        onMinusClick = { viewModel.updateShortBreakDuration(-1)},
+                        onMinusClick = { viewModel.updateShortBreakDuration(-1) },
                         modifier = Modifier.alpha(if (isTimerRunning) 0.5f else 1f)
                     )
                     Text(
@@ -156,7 +158,7 @@ fun SettingsScreen(
                     DurationComponents(
                         duration = uiState.longBreakDuration,
                         onPlusClick = { viewModel.updateLongBreakDuration(+1) },
-                        onMinusClick = { viewModel.updateLongBreakDuration(-1)},
+                        onMinusClick = { viewModel.updateLongBreakDuration(-1) },
                         modifier = Modifier.alpha(if (isTimerRunning) 0.5f else 1f)
                     )
                     Text(
@@ -179,7 +181,7 @@ fun SettingsScreen(
                     modifier = Modifier
                         .height(90.dp)
                         .width(90.dp)
-                        .alpha(if(isTimerRunning) 0.5f else 1f),
+                        .alpha(if (isTimerRunning) 0.5f else 1f),
                     shape = RoundedCornerShape(10),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = SemiTransparent,
@@ -211,7 +213,7 @@ fun SettingsScreen(
             )
             SettingsSessionCounts(
                 sessionCount = sessionCount,
-                onSessionChange = {viewModel.updateTotalSection(it)},
+                onSessionChange = { viewModel.updateTotalSection(it) },
                 modifier = Modifier.alpha(if (isTimerRunning) 0.5f else 1f)
 
             )
@@ -234,13 +236,13 @@ fun SettingsScreen(
             SettingSwitch(
                 "Vibration",
                 checked = uiState.vibrationEnabled,
-                onCheckedChange = {viewModel.updateVibration(it)}
+                onCheckedChange = { viewModel.updateVibration(it) }
             )
             Spacer(modifier = Modifier.height(15.dp))
             SettingSwitch(
                 "Stay Awake",
                 checked = uiState.stayAwake,
-                onCheckedChange = {viewModel.updateStayAwake(it)}
+                onCheckedChange = { viewModel.updateStayAwake(it) }
             )
 
             /* ~~~~~~~~~~~~~ Additional ~~~~~~~~~~~~~~*/
@@ -264,7 +266,10 @@ fun SettingsScreen(
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    AdditionalComponents(text = "?")
+                    AdditionalComponents(
+                        text = "?",
+                        onClick = { showPomodoroInfo = true }
+                    )
                     Text(
                         modifier = Modifier.padding(top = 8.dp),
                         text = "What is \npomodoro",
@@ -322,7 +327,7 @@ fun SettingsScreen(
             )
             if (showAlert) {
                 AlertDialog(
-                    containerColor = SemiTransparent,
+                    containerColor = NotReallyTransparent,
                     onDismissRequest = { showAlert = false },
                     title = {
                         Text(
@@ -354,6 +359,52 @@ fun SettingsScreen(
                     }
                 )
             }
+            if (showPomodoroInfo) {
+                AlertDialog(
+                    containerColor = NotReallyTransparent,
+                    onDismissRequest = { showPomodoroInfo = false },
+                    title = {
+                        Text(
+                            text = "What is Pomodoro?",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = White
+                        )
+                    },
+                    text = {
+                        Text(
+                            text = """
+Pomodoro Technique is a time management method that helps you stay focused and productive.
+
+It works by breaking work into focused sessions (usually 25 minutes), followed by short breaks.
+
+After several focus sessions, you take a longer break to rest and recharge.
+
+This method helps reduce burnout, improve concentration, and make large tasks feel more manageable.
+                """.trimIndent(),
+                            fontSize = 14.sp,
+                            color = White
+                        )
+                    },
+                    confirmButton = {
+                        TextButton(
+                            onClick = { showPomodoroInfo = false },
+                            colors = ButtonDefaults.textButtonColors(
+                                containerColor = Pink
+                            ),
+                            shape = RoundedCornerShape(25)
+                        ) {
+                            Text(
+                                text = "OK",
+                                color = White,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 18.sp
+                            )
+                        }
+                    }
+                )
+            }
+
         }
     }
 }

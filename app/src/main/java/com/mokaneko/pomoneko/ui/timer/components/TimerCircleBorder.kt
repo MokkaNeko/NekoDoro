@@ -17,9 +17,7 @@ fun TimerCircleBorder(
     modifier: Modifier = Modifier,
     strokeWidth: Dp = 8.dp,
     color1: Color = White,
-    color2: Color = Inactive,
-    whiteSweep: Float = 360f * progress,
-    greySweep: Float = 360f - whiteSweep
+    color2: Color = Inactive
 ) {
     Canvas(
         modifier = modifier.aspectRatio(1f)
@@ -28,17 +26,16 @@ fun TimerCircleBorder(
             width = strokeWidth.toPx()
         )
         val startAngle = 90f
-        drawArc(
+        val sweepAngle = 360f * progress
+        drawCircle(
             color = color2,
-            startAngle = startAngle + whiteSweep,
-            sweepAngle = greySweep,
-            useCenter = false,
+            radius = (size.minDimension / 2),
             style = stroke
         )
         drawArc(
             color = color1,
             startAngle = startAngle,
-            sweepAngle = whiteSweep,
+            sweepAngle = sweepAngle,
             useCenter = false,
             style = stroke
         )

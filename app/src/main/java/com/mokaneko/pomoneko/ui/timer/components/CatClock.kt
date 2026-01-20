@@ -1,9 +1,9 @@
 package com.mokaneko.pomoneko.ui.timer.components
 
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
@@ -14,11 +14,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
@@ -27,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import com.mokaneko.pomoneko.R
 import com.mokaneko.pomoneko.data.local.PomodoroPhase
 import com.mokaneko.pomoneko.ui.theme.Inactive
+import com.mokaneko.pomoneko.ui.theme.SemiTransparent
 import com.mokaneko.pomoneko.ui.theme.White
 import com.mokaneko.pomoneko.ui.timer.state.TimerState
 
@@ -36,41 +33,33 @@ fun CatClock(
     phase: PomodoroPhase,
     timerState: TimerState
 ) {
-    val animatedProgress = remember { Animatable(progress) }
-
-    var lastPhase by remember { mutableStateOf(phase) }
-    var latchedVisualProgress by remember { mutableStateOf(0f) }
-
-    LaunchedEffect(progress, timerState) {
-        if (timerState == TimerState.STOPPED) {
-            animatedProgress.animateTo(
-                targetValue = 0f,
-                animationSpec = tween(600, easing = LinearEasing)
-            )
+    val animatedProgress by animateFloatAsState(
+        targetValue = if (timerState == TimerState.STOPPED) 0f else progress,
+        animationSpec = if (timerState == TimerState.STOPPED) {
+            tween(1000)
         } else {
-            animatedProgress.animateTo(
-                targetValue = progress,
-                animationSpec = tween(1000, easing = LinearEasing)
-            )
-        }
+            tween(durationMillis = 1000, easing = LinearEasing)
+        },
+        label = "TimerProgress"
+    )
+    val activeColor = when (phase) {
+        PomodoroPhase.FOCUS -> White
+        PomodoroPhase.SHORT_BREAK, PomodoroPhase.LONG_BREAK -> Inactive
     }
-
-    val rawVisualProgress = when (phase) {
-        PomodoroPhase.FOCUS -> animatedProgress.value
-        else -> 1f - animatedProgress.value
+    val animatedActiveColor by animateColorAsState(
+        targetValue = if (timerState == TimerState.STOPPED) Inactive else activeColor,
+        animationSpec = tween(1000),
+        label = "PhaseColor"
+    )
+    val inactiveColor = when (phase) {
+        PomodoroPhase.FOCUS -> Inactive
+        PomodoroPhase.SHORT_BREAK, PomodoroPhase.LONG_BREAK -> SemiTransparent
     }
-
-    LaunchedEffect(phase, rawVisualProgress) {
-        latchedVisualProgress = rawVisualProgress
-        lastPhase = phase
-    }
-
-    val visualProgress =
-        if (phase != lastPhase) {
-            latchedVisualProgress
-        } else {
-            rawVisualProgress
-        }
+    val animatedInactiveColor by animateColorAsState(
+        targetValue = if (timerState == TimerState.STOPPED) Inactive else inactiveColor,
+        animationSpec = tween(1000),
+        label = "PhaseColor"
+    )
 
     val targetColor = when {
         timerState == TimerState.STOPPED -> Inactive
@@ -99,9 +88,11 @@ fun CatClock(
         val earOffsetY = -(clockSize * 0.42f)
         Box(contentAlignment = Alignment.Center) {
             TimerCircleBorder(
-                progress = visualProgress,
+                progress = animatedProgress,
                 modifier = Modifier.size(clockSize),
-                strokeWidth = 18.dp
+                strokeWidth = 18.dp,
+                color1 = animatedActiveColor,
+                color2 = animatedInactiveColor
             )
 
             Image(
