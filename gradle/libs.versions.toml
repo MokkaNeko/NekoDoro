@@ -17,6 +17,7 @@ material3 = "1.4.0"
 hilt = "2.57.2"
 
 [libraries]
+androidx-compose-foundation = { module = "androidx.compose.foundation:foundation" }
 androidx-constraintlayout-compose = { module = "androidx.constraintlayout:constraintlayout-compose", version.ref = "constraintlayoutCompose" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
