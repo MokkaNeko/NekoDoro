@@ -155,7 +155,7 @@ fun TimerContent(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f),
+                    .padding(top = 20.dp),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {

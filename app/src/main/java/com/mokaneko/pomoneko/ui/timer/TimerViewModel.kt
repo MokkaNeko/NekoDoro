@@ -207,6 +207,7 @@ class TimerViewModel @Inject constructor(private val repository: PomodoroReposit
 
     fun onPlay() {
         if (timerJob != null) return
+        val firstSession: Boolean = uiState.value.timerState == TimerState.STOPPED
 
         repository.updateTimerState(TimerState.RUNNING)
         _uiState.value = uiState.value.copy(
@@ -214,6 +215,7 @@ class TimerViewModel @Inject constructor(private val repository: PomodoroReposit
         )
 
         timerJob = viewModelScope.launch {
+            if (firstSession) delay(500)
             while (remainingSeconds > 0) {
                 delay(1000)
                 remainingSeconds--
