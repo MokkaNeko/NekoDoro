@@ -13,6 +13,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.mokaneko.pomoneko.navigation.HowToFromSettingsRoute
 import com.mokaneko.pomoneko.navigation.HowToRoute
 import com.mokaneko.pomoneko.navigation.Screen
 import com.mokaneko.pomoneko.ui.settings.SettingsScreen
@@ -47,12 +48,19 @@ class MainActivity : ComponentActivity() {
                         composable(Screen.HowTo.route) {
                             HowToRoute(navController)
                         }
+                        composable(Screen.HowToFromSettings.route) {
+                            HowToFromSettingsRoute(navController)
+                        }
+
                         composable(Screen.Timer.route) {
                             TimerRoute(navController)
                         }
                         composable(Screen.Setting.route) {
                             SettingsScreen(
-                                onBack = { navController.popBackStack() }
+                                onBack = { navController.popBackStack() },
+                                onOpenHowTo = {
+                                    navController.navigate(Screen.HowToFromSettings.route)
+                                }
                             )
                         }
                     }

@@ -51,6 +51,7 @@ import com.mokaneko.pomoneko.ui.theme.poppins
 @Composable
 fun SettingsScreen(
     onBack: () -> Unit,
+    onOpenHowTo: () -> Unit,
     viewModel: SettingsViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState
@@ -286,7 +287,10 @@ fun SettingsScreen(
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    AdditionalComponents(text = "?")
+                    AdditionalComponents(
+                        text = "?",
+                        onClick = { onOpenHowTo() }
+                    )
                     Text(
                         modifier = Modifier.padding(top = 8.dp),
                         text = "How to \nuse",
@@ -413,5 +417,8 @@ This method helps reduce burnout, improve concentration, and make large tasks fe
 @Composable
 @Preview
 fun OptionPreview() {
-    SettingsScreen(onBack = {})
+    SettingsScreen(
+        onBack = {},
+        onOpenHowTo = {}
+    )
 }

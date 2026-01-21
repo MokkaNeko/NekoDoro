@@ -49,7 +49,7 @@ import com.mokaneko.pomoneko.util.VibrationHelper
 @Composable
 fun TimerScreen(
     viewModel: TimerViewModel = hiltViewModel(),
-    onOpenSettings: () -> Unit
+    onOpenSettings: () -> Unit,
 ){
     val uiState by viewModel.uiState
     val context = LocalContext.current

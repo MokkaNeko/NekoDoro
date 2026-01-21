@@ -3,6 +3,7 @@ package com.mokaneko.pomoneko.ui.tutorial
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -14,16 +15,19 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.mokaneko.pomoneko.ui.theme.DarkGreen
 import com.mokaneko.pomoneko.ui.theme.Green
 import com.mokaneko.pomoneko.ui.tutorial.components.HowToActionButton
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -34,6 +38,7 @@ fun HowToCarousel(
 ) {
     val pagerState = rememberPagerState { pages.size }
     val lastIndex = pages.lastIndex
+    val scope = rememberCoroutineScope()
 
     val backgroundColor by animateColorAsState(
         targetValue = if (pagerState.currentPage == pages.lastIndex)
@@ -41,17 +46,29 @@ fun HowToCarousel(
         label = "HowToBackground"
     )
     Box(
-        modifier = modifier.fillMaxSize()
+        modifier = modifier
+            .fillMaxSize()
+            .background(backgroundColor)
+            .pointerInput(pagerState.currentPage) {
+                detectTapGestures {
+                    if (pagerState.currentPage < lastIndex) {
+                        scope.launch {
+                            pagerState.animateScrollToPage(
+                                pagerState.currentPage + 1
+                            )
+                        }
+                    } else {
+                        onFinish()
+                    }
+                }
+            }
     ) {
         HorizontalPager(
             state = pagerState,
-            modifier = Modifier.fillMaxSize(),
-            userScrollEnabled = pagerState.currentPage != lastIndex
+            modifier = Modifier.fillMaxSize()
         ) { pageIndex ->
             Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(backgroundColor),
+                modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
                 HowToPageItem(
